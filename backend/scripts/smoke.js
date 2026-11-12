@@ -145,8 +145,10 @@ async function main() {
   const freelancers = await req('GET', '/users/freelancers', { token: tokCli });
   check('GET /users/freelancers → 10+ freelancers', freelancers.status === 200 && (freelancers.data.freelancers || []).length >= 10,
     `status=${freelancers.status} total=${(freelancers.data.freelancers || []).length}`);
-  const freelaSeed = (freelancers.data.freelancers || []).find((f) => f.email === 'freela@freelamz.com');
-  check('Seed: freela@freelamz.com visível com perfil', !!freelaSeed && !!freelaSeed.titulo, freelaSeed ? 'sem titulo' : 'não encontrado');
+  /* A API pública não devolve o e-mail (privacidade); identificamos o
+     freelancer de seed pelo nome. */
+  const freelaSeed = (freelancers.data.freelancers || []).find((f) => f.nome === 'Isabel Sitoe' || f.email === 'freela@freelamz.com');
+  check('Seed: freelancer Isabel Sitoe visível com perfil', !!freelaSeed && !!freelaSeed.titulo, freelaSeed ? 'sem titulo' : 'não encontrado');
 
   const cats = await req('GET', '/categories');
   check('GET /categories → 10+ categorias', cats.status === 200 && (cats.data.categories || []).length >= 10,

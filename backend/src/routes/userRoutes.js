@@ -6,8 +6,11 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 const { uploadAvatar, uploadCapa, uploadPortfolio } = require('../middleware/uploadImgs');
 
 router.get('/dashboard', authenticateToken, userController.getDashboard);
-router.get('/freelancers', authenticateToken, userController.listFreelancers);
-router.get('/freelancers/:id', authenticateToken, userController.getFreelancerById);
+/* Listagem e perfil de freelancer são públicos (visitantes sem conta
+   também precisam de os ver na página inicial). O modelo remove os
+   campos privados antes de responder. */
+router.get('/freelancers', userController.listFreelancers);
+router.get('/freelancers/:id', userController.getFreelancerById);
 router.get('/clientes/:id/publico', authenticateToken, userController.getClientePublico);
 router.get('/profile', authenticateToken, userController.getProfile);
 router.put('/profile', authenticateToken, userController.updateProfile);

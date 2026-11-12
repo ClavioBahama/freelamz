@@ -27,7 +27,7 @@ function parseListas(p) {
 /* Remove campos sensíveis (visíveis só para o dono/admin) */
 function semPrivados(profile) {
   if (!profile) return null;
-  const { metodos_recebimento, ...resto } = profile;
+  const { metodos_recebimento, email, ...resto } = profile;
   return resto;
 }
 

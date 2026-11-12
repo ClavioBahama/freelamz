@@ -101,9 +101,17 @@ async function request(endpoint, options = {}) {
   }
 
   if (res.status === 401) {
-    sessaoExpirada();
-    const err = new Error(data.message || 'Sessão expirada. Faça login novamente.');
+    /* Só termina a sessão se havia mesmo uma sessão iniciada.
+       Numa página pública (sem token) um 401 não deve expulsar o visitante. */
+    if (token) {
+      sessaoExpirada();
+      const err = new Error(data.message || 'Sessão expirada. Faça login novamente.');
+      err.status = 401;
+      throw err;
+    }
+    const err = new Error(data.message || 'Precisa de iniciar sessão para continuar.');
     err.status = 401;
+    err.data = data;
     throw err;
   }
 
@@ -136,7 +144,7 @@ export const api = {
     avisarOnline();
     let data;
     try { data = await res.json(); } catch (e) { data = {}; }
-    if (res.status === 401) { sessaoExpirada(); }
+    if (res.status === 401) { if (token) sessaoExpirada(); }
     if (!res.ok) { const err = new Error(data.message || 'Erro no upload'); err.status = res.status; throw err; }
     return data;
   },
@@ -155,7 +163,7 @@ export const api = {
     avisarOnline();
     let data;
     try { data = await res.json(); } catch (e) { data = {}; }
-    if (res.status === 401) { sessaoExpirada(); }
+    if (res.status === 401) { if (token) sessaoExpirada(); }
     if (!res.ok) { const err = new Error(data.message || 'Erro no upload'); err.status = res.status; throw err; }
     return data;
   },
