@@ -6,6 +6,7 @@ import { toast } from '../js/layout.js';
 export default function login(props, { $h, $onMounted, $f7route, $f7router, $update }) {
   let email = '';
   let senha = '';
+  let verSenha = false;
   let enviando = false;
   let erro = '';
   let aviso = '';
@@ -19,6 +20,7 @@ export default function login(props, { $h, $onMounted, $f7route, $f7router, $upd
 
   const setEmail = (e) => { email = e.target.value; };
   const setSenha = (e) => { senha = e.target.value; };
+  const alternarSenha = () => { verSenha = !verSenha; $update(); };
 
   const entrar = async (e) => {
     if (e) e.preventDefault();
@@ -70,15 +72,21 @@ export default function login(props, { $h, $onMounted, $f7route, $f7router, $upd
               <div class="field-input">
                 <i class="f7-icons">envelope</i>
                 <input type="email" name="email" placeholder="ovoce@exemplo.co.mz" value=${email}
-                  @input=${setEmail} autocomplete="email" />
+                  @input=${setEmail} autocomplete="email" inputmode="email"
+                  autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" />
               </div>
             </div>
             <div>
               <label class="field-label">Senha</label>
-              <div class="field-input">
+              <div class="field-input has-toggle">
                 <i class="f7-icons">lock</i>
-                <input type="password" name="senha" placeholder="••••••" value=${senha}
-                  @input=${setSenha} autocomplete="current-password" />
+                <input type=${verSenha ? 'text' : 'password'} name="senha" placeholder="••••••" value=${senha}
+                  @input=${setSenha} autocomplete="current-password"
+                  autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+                <button type="button" class="field-toggle" @click=${alternarSenha}
+                  aria-label=${verSenha ? 'Esconder senha' : 'Mostrar senha'}>
+                  <i class="f7-icons">${verSenha ? 'eye_slash' : 'eye'}</i>
+                </button>
               </div>
             </div>
             <button class="btn btn-primary btn-block ${enviando ? 'loading' : ''}"

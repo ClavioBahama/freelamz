@@ -196,6 +196,30 @@ Alternativa com variáveis separadas: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSW
 O `db:init` executa `database/schema.sql`, `database/seed.sql` (categorias + habilidades), as migrações
 e cria/atualiza apenas o utilizador **ADMIN**. Não cria contas de teste.
 
+### Dados de demonstração (opcional)
+
+Para a aplicação não aparecer vazia (freelancers + serviços de exemplo):
+
+```powershell
+cd C:\laragon\www\freelamz\backend
+$env:MYSQL_URL="mysql://root:SENHA@HOST-PUBLICO:PORTA/railway"
+$env:DB_SSL="true"
+npm run db:demo
+```
+
+Cria **8 freelancers + 2 clientes** (e-mails `@demo.freelamz.mz`) com perfil, habilidades e serviços.
+É idempotente (repetir não duplica). A senha de todas as contas demo é `Demo1234`; para outra:
+
+```powershell
+$env:DEMO_PASSWORD="OutraSenhaForte"; npm run db:demo
+```
+
+Para remover os dados de demonstração (só apaga os e-mails `@demo.freelamz.mz`):
+
+```powershell
+npm run db:demo:limpar
+```
+
 ### Ficheiros enviados (uploads)
 
 O disco do Railway é **efémero**: tudo o que for escrito em `uploads/` desaparece no próximo deploy.
@@ -209,6 +233,19 @@ Sem uma destas opções, as imagens funcionam, mas perdem-se a cada deploy.
 ---
 
 ## 4. Credenciais de Teste
+
+### Produção (Railway)
+
+| Usuário | Email | Senha | Tipo |
+|---------|-------|-------|------|
+| Administrador | o e-mail definido em `ADMIN_EMAIL` | a senha definida em `ADMIN_PASSWORD` (no `db:init`) | ADMIN |
+| Freelancers demo (8) | `isabel@demo.freelamz.mz`, `carlos@…`, `beatriz@…`, `helder@…`, `rosa@…`, `amos@…`, `luis@…`, `marta@…` | `Demo1234` | FREELANCER |
+| Clientes demo (2) | `cliente@demo.freelamz.mz`, `empresa@demo.freelamz.mz` | `Demo1234` | CLIENTE |
+
+> As contas demo só existem depois de correr `npm run db:demo`. **Mude a senha** (`DEMO_PASSWORD`) antes de
+> divulgar a app a utilizadores reais, ou remova-as com `npm run db:demo:limpar`.
+
+### Local (seed de desenvolvimento)
 
 Criadas pelo seed (`backend/src/scripts/seed.js`):
 

@@ -10,6 +10,8 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "db:init": "node scripts/init-db.js",
+    "db:demo": "node scripts/demo-seed.js",
+    "db:demo:limpar": "node scripts/demo-seed.js --limpar",
     "seed": "node src/scripts/seed.js",
     "migrate": "node src/scripts/migrate.js",
     "smoke": "node scripts/smoke.js",
