@@ -17,6 +17,10 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = '0.0.0.0';
 const EM_PRODUCAO = emProducao();
 const VERBOSO = !EM_PRODUCAO || process.env.LOG_VERBOSE === 'true';
+/* Revisão do deploy (Railway expõe o SHA do commit). */
+const REVISAO = String(
+  process.env.RAILWAY_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'local'
+).slice(0, 7);
 
 /* Atrás do proxy do Railway (HTTPS terminado à frente). */
 app.set('trust proxy', 1);
@@ -101,6 +105,13 @@ app.get('/api/health', (req, res) => {
     name: 'FreelaMZ API',
     status: 'ok',
     db: estadoBanco.online ? 'up' : 'down',
+    revisao: REVISAO,
+    seed_demo: {
+      pedido: String(process.env.SEED_DEMO || '').toLowerCase() === 'true',
+      em_curso: demoSeedEstado.emCurso,
+      feito: demoSeedEstado.feito,
+      erro: demoSeedEstado.erro,
+    },
   });
 });
 
@@ -180,23 +191,27 @@ function iniciarLembretes() {
    Com SEED_DEMO=true no Railway, o próprio servidor cria os
    freelancers/serviços de exemplo usando a MYSQL_URL interna.
    Assim não é preciso copiar a URL pública nem a senha. */
-let demoSeedFeito = false;
+const demoSeedEstado = { emCurso: false, feito: false, erro: null };
 
 function semearDemoSePedido() {
-  if (demoSeedFeito) return;
+  if (demoSeedEstado.emCurso || demoSeedEstado.feito) return;
   if (String(process.env.SEED_DEMO || '').toLowerCase() !== 'true') return;
-  demoSeedFeito = true;
+  demoSeedEstado.emCurso = true;
+  demoSeedEstado.erro = null;
   const { main: semearDemo } = require('../scripts/demo-seed');
   console.log('[DEMO] SEED_DEMO=true — a criar dados de demonstração…');
   semearDemo()
     .then(() => {
+      demoSeedEstado.feito = true;
+      demoSeedEstado.emCurso = false;
       console.log('[DEMO] Dados de demonstração prontos.');
       console.log('[DEMO] Pode remover a variável SEED_DEMO (ou definir false).');
     })
     .catch((err) => {
-      console.error('[DEMO] Falhou:', err.code || '', err.message);
+      demoSeedEstado.erro = `${err.code || ''} ${err.message || err}`.trim().slice(0, 300);
+      demoSeedEstado.emCurso = false;
+      console.error('[DEMO] Falhou:', demoSeedEstado.erro);
       console.error('[DEMO] Será tentado de novo quando a base de dados responder.');
-      demoSeedFeito = false;
     });
 }
 
