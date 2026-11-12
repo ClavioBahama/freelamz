@@ -11,8 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-
-const RAIZ_UPLOADS = path.join(__dirname, '..', '..', 'uploads');
+const { UPLOADS_DIR: RAIZ_UPLOADS } = require('../config/paths');
 
 let sharp = null;
 try {

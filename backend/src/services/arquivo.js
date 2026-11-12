@@ -9,8 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-
-const RAIZ = path.join(__dirname, '..', '..', 'uploads_private', 'deliveries');
+const { DELIVERIES_DIR: RAIZ } = require('../config/paths');
 
 const LIMITE_BYTES = 20 * 1024 * 1024; // 20 MB
 const MAX_FICHEIROS = 5;

@@ -7,8 +7,10 @@
    do ALTER. Tabelas novas usam CREATE TABLE IF NOT EXISTS.
    Nunca apaga dados — apenas adiciona/preenche.
    ============================================================ */
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const mysql = require('mysql2/promise');
+const { opcoesMysql } = require('../config/dbConfig');
+const paths = require('../config/paths');
 
 function slug(nome) {
   return String(nome || 'user')
@@ -38,14 +40,7 @@ async function indexesExistentes(c, tabela) {
 }
 
 async function main() {
-  const c = await mysql.createConnection({
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: parseInt(process.env.DB_PORT, 10) || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'freelamz',
-    multipleStatements: true,
-  });
+  const c = await mysql.createConnection(opcoesMysql({ multipleStatements: true }));
 
   try {
     console.log('[MIGRATE] A ligar ao banco…');
@@ -164,15 +159,8 @@ async function main() {
     }
 
     /* ---------- Diretório de uploads ---------- */
-    const fs = require('fs');
-    const path = require('path');
-    for (const dir of ['avatars', 'covers', 'portfolio', 'seed']) {
-      const p = path.join(__dirname, '..', 'uploads', dir);
-      fs.mkdirSync(p, { recursive: true });
-      const keep = path.join(p, '.gitkeep');
-      if (!fs.existsSync(keep)) fs.writeFileSync(keep, '');
-    }
-    console.log('[MIGRATE] Pastas de uploads garantidas (avatars/covers/portfolio/seed)');
+    paths.garantirPastas();
+    console.log('[MIGRATE] Pastas de uploads garantidas em:', paths.UPLOADS_DIR);
 
     /* ============================================================
        FASE A — Pagamentos fictícios com escrow (idempotente)
@@ -387,10 +375,7 @@ async function main() {
     }
 
     /* ---------- pasta privada de entregas (não servida por /uploads) ---------- */
-    const pastaEntregas = path.join(__dirname, '..', '..', 'uploads_private', 'deliveries');
-    fs.mkdirSync(pastaEntregas, { recursive: true });
-    const keepEntregas = path.join(pastaEntregas, '.gitkeep');
-    if (!fs.existsSync(keepEntregas)) fs.writeFileSync(keepEntregas, '');
+    console.log('[MIGRATE] Entregas privadas em:', paths.DELIVERIES_DIR);
 
     console.log('[MIGRATE] FASE A: wallets/transactions/escrow/deliveries/withdrawals/ajustes garantidos');
 

@@ -107,6 +107,91 @@ npm run dev       # roda em http://localhost:5173 (proxy para a API)
 
 Abra o navegador em `http://localhost:5173`.
 
+### Testar o arranque de produção localmente
+
+```powershell
+cd C:\laragon\www\freelamz\backend
+npm ci
+npm start                       # http://localhost:3000
+```
+
+Verifique `http://localhost:3000/api/health` → `{"success":true,"name":"FreelaMZ API","status":"ok"}`.
+
+---
+
+## 3.1. Deploy no Railway (backend)
+
+O backend é publicado como um serviço Node.js no [Railway](https://railway.com) e usa o **MySQL do próprio Railway**. O repositório é um monorepo, por isso o serviço **tem de** apontar para a subpasta `backend`.
+
+### Configuração do serviço
+
+| Campo | Valor |
+|-------|-------|
+| Root Directory | `/backend` |
+| Build | RAILPACK (definido em `backend/railway.json`) |
+| Start Command | `npm start` |
+| Healthcheck Path | `/api/health` |
+
+> Sem **Root Directory = /backend**, o build falha com `railpack process exited with an error`, porque não existe `package.json` na raiz do repositório.
+
+### Variáveis de ambiente (serviço do backend)
+
+| Variável | Valor |
+|----------|-------|
+| `NODE_ENV` | `production` |
+| `JWT_SECRET` | valor aleatório longo (gere localmente, ver abaixo) |
+| `CORS_ORIGINS` | origens web, ex.: `https://freelamz.com` |
+| `ADMIN_EMAIL` | e-mail do administrador |
+| `ADMIN_PASSWORD` | senha forte (mínimo 8 caracteres) |
+| `DB_SSL` | `true` (MySQL gerido) |
+| `UPLOADS_DIR` | `/app/uploads` (se usar Volume) |
+
+A ligação ao MySQL pode ser feita de duas formas:
+
+1. **Automática (recomendada):** referenciar as variáveis do serviço MySQL no painel do Railway:
+   `DB_HOST=${{MySQL.MYSQLHOST}}`, `DB_PORT=${{MySQL.MYSQLPORT}}`, `DB_USER=${{MySQL.MYSQLUSER}}`,
+   `DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}`, `DB_NAME=${{MySQL.MYSQLDATABASE}}`.
+2. **Uma só string:** `MYSQL_URL=${{MySQL.MYSQL_URL}}`.
+
+Se nenhuma for definida, o código também lê `MYSQLHOST`/`MYSQLPORT`/`MYSQLUSER`/`MYSQLPASSWORD`/`MYSQLDATABASE` diretamente (variáveis nativas do Railway).
+
+Gerar um `JWT_SECRET` no PowerShell:
+
+```powershell
+[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+```
+
+### Criar as tabelas e o administrador
+
+Depois do primeiro deploy, corra o script idempotente **do seu PC**, apontando para o MySQL público do Railway
+(Railway > MySQL > **Connect** > *Public Networking*):
+
+```powershell
+cd C:\laragon\www\freelamz\backend
+$env:DB_HOST="host-publico.railway.app"
+$env:DB_PORT="12345"
+$env:DB_USER="root"
+$env:DB_PASSWORD="a-password-do-railway"
+$env:DB_NAME="railway"
+$env:DB_SSL="true"
+$env:ADMIN_EMAIL="seu@email.com"
+$env:ADMIN_PASSWORD="uma-senha-forte"
+npm run db:init
+```
+
+O `db:init` executa `database/schema.sql`, `database/seed.sql` (categorias + habilidades), as migrações
+e cria/atualiza apenas o utilizador **ADMIN**. Não cria contas de teste.
+
+### Ficheiros enviados (uploads)
+
+O disco do Railway é **efémero**: tudo o que for escrito em `uploads/` desaparece no próximo deploy.
+
+- **Opção A (simples):** criar um **Volume** no serviço e montá-lo em `/app/uploads`; definir
+  `UPLOADS_DIR=/app/uploads` e `UPLOADS_PRIVATE_DIR=/app/uploads_private`.
+- **Opção B (escala):** usar um serviço externo de imagens (ex.: Cloudinary) e guardar apenas as URLs na base de dados.
+
+Sem uma destas opções, as imagens funcionam, mas perdem-se a cada deploy.
+
 ---
 
 ## 4. Credenciais de Teste
@@ -144,12 +229,16 @@ C:\laragon\www\freelamz
 │   │   └── components/
 │   └── favicon.svg
 ├── backend/               # Node.js + Express
-│   ├── server.js
+│   ├── src/server.js      # Entrada (PORT, 0.0.0.0, trust proxy, /api/health)
+│   ├── scripts/init-db.js # Schema + seed mínimo + admin (npm run db:init)
+│   ├── railway.json       # Build RAILPACK, start, healthcheck
 │   ├── .env
 │   ├── .env.example
 │   ├── package.json
 │   ├── src/
 │   │   ├── config/db.js   # Pool MySQL (mysql2)
+│   │   ├── config/dbConfig.js # DB_* / MYSQL_* / MYSQL_URL + SSL
+│   │   ├── config/paths.js    # UPLOADS_DIR / UPLOADS_PRIVATE_DIR
 │   │   ├── controllers/   # auth, user, service, project, payment, delivery, admin, etc.
 │   │   ├── routes/        # Rotas da API REST
 │   │   ├── middleware/    # auth, validação, upload (multer + magic bytes)

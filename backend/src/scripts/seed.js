@@ -10,6 +10,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const { opcoesMysql } = require('../config/dbConfig');
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@freelamz.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@12345';
@@ -17,14 +18,7 @@ const CLIENTE_EMAIL = 'cliente@freelamz.com';
 const FREELA_EMAIL = 'freela@freelamz.com';
 
 async function main() {
-  const c = await mysql.createConnection({
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: parseInt(process.env.DB_PORT, 10) || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'freelamz',
-    multipleStatements: true,
-  });
+  const c = await mysql.createConnection(opcoesMysql({ multipleStatements: true }));
 
   try {
     console.log('[SEED] A ligar ao banco…');

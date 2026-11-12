@@ -6,13 +6,14 @@
    ============================================================ */
 const fs = require('fs');
 const path = require('path');
+const { UPLOADS_DIR } = require('../config/paths');
 
 let sharp = null;
 try { sharp = require('sharp'); } catch (e) {
   throw new Error('sharp é necessário para gerar as imagens do seed (npm i sharp)');
 }
 
-const PASTA = path.join(__dirname, '..', '..', 'uploads', 'seed');
+const PASTA = path.join(UPLOADS_DIR, 'seed');
 
 /* Paletas por categoria de freelancer (gradiente + cor de acento) */
 const PALETAS = [
