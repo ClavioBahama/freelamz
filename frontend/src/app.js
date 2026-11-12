@@ -20,7 +20,7 @@ import {
    Com navegação por HASH (compatível com o APK), a rota atual
    vem de nav.js (hash primeiro, pathname para URLs antigas).
    ============================================================ */
-const ROTAS_PUBLICAS = ['/login', '/register', '/splash', '/not-found'];
+const ROTAS_PUBLICAS = ['/login', '/register', '/splash', '/not-found', '/sobre'];
 
 /* Converte URLs antigas (/home) para /#!/home antes de decidir. */
 normalizarUrl();

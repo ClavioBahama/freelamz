@@ -28,6 +28,7 @@ export default function splash(props, { $h, $onMounted, $onUnmounted, $f7router 
           <div class="splash-logo">✨</div>
           <div class="splash-name">FreelaMZ</div>
           <div class="splash-slogan">Encontre talentos. Encontre oportunidades.</div>
+          <div class="splash-credito">por Clávio Alfredo Chitsulete</div>
           <div class="splash-bar"><i></i></div>
         </div>
       </div>

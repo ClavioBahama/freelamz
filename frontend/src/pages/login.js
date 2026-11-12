@@ -99,6 +99,11 @@ export default function login(props, { $h, $onMounted, $f7route, $f7router, $upd
             Não tem conta?
             <a href="/register" @click=${(e) => { e.preventDefault(); $f7router.navigate('/register'); }}>Criar conta grátis</a>
           </div>
+
+          <div class="auth-credito">
+            Feito por
+            <a href="/sobre" @click=${(e) => { e.preventDefault(); $f7router.navigate('/sobre'); }}>Clávio Alfredo Chitsulete</a>
+          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import {
   navbar, renderAvatar, toast, logout, errorState, atualizarPanel, renderButton,
 } from '../js/layout.js';
 
-export default function settings(props, { $h, $onMounted, $update }) {
+export default function settings(props, { $h, $onMounted, $update, $f7router }) {
   let usuario = loadAuth().user || {};
   let form = {
     nome: usuario.nome || '',
@@ -119,14 +119,25 @@ export default function settings(props, { $h, $onMounted, $update }) {
             <!-- Sobre -->
             <div class="section-title">Sobre</div>
             <div class="mz-list-card">
-              <div class="mz-list-item">
+              <div class="mz-list-item" @click=${() => $f7router.navigate('/sobre')}>
                 <div class="notif-icon-box" style="background:var(--grad-primary); width:38px; height:38px; min-width:38px; border-radius:12px; font-size:17px;">
                   <i class="f7-icons">info_circle</i>
                 </div>
                 <div class="mz-list-main">
                   <div class="mz-list-title">FreelaMZ</div>
-                  <div class="mz-list-sub">Versão 1.0.0 — marketplace de talentos moçambicanos</div>
+                  <div class="mz-list-sub">Versão 1.0.0 — sobre a app e o autor</div>
                 </div>
+                <i class="f7-icons" style="color:#94a3b8;">chevron_right</i>
+              </div>
+              <div class="mz-list-item" @click=${() => $f7router.navigate('/sobre')}>
+                <div class="notif-icon-box" style="background:var(--grad-coral); width:38px; height:38px; min-width:38px; border-radius:12px; font-size:17px;">
+                  <i class="f7-icons">person_crop_circle</i>
+                </div>
+                <div class="mz-list-main">
+                  <div class="mz-list-title">Feito por Clávio Alfredo Chitsulete</div>
+                  <div class="mz-list-sub">Como o FreelaMZ foi construído</div>
+                </div>
+                <i class="f7-icons" style="color:#94a3b8;">chevron_right</i>
               </div>
               <div class="mz-list-item" @click=${limparCache}>
                 <div class="notif-icon-box" style="background:var(--grad-amber); width:38px; height:38px; min-width:38px; border-radius:12px; font-size:17px;">

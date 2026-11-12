@@ -1231,6 +1231,7 @@ body.rota-publica .panel-backdrop { display: none !important; }
 }
 .splash-name { font-size: 40px; font-weight: 900; letter-spacing: 2px; }
 .splash-slogan { font-size: 15px; opacity: 0.85; margin-top: 8px; font-weight: 500; }
+.splash-credito { font-size: 11.5px; opacity: 0.6; margin-top: 14px; letter-spacing: 0.3px; }
 .splash-bar {
   width: 60px;
   height: 4px;
@@ -1332,6 +1333,43 @@ body.rota-publica .panel-backdrop { display: none !important; }
   color: var(--mz-text-2);
 }
 .auth-footer a { font-weight: 700; }
+.auth-credito {
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+.auth-credito a { color: #fff; font-weight: 800; text-decoration: none; }
+
+/* ---------- Página "Sobre" ---------- */
+.sobre-logo {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 12px auto;
+  border-radius: 22px;
+  background: var(--grad-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+}
+.sobre-logo-sm {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  margin: 0;
+  border-radius: 18px;
+  font-size: 24px;
+}
+.sobre-p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--mz-text);
+}
+.sobre-p strong { color: var(--mz-navy); }
 
 /* ---------- Detalhe (serviço/freelancer/projeto) ---------- */
 .detail-hero {

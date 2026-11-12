@@ -133,6 +133,11 @@ export default [
     asyncComponent: () => import('./pages/settings.js'),
   },
   {
+    path: '/sobre',
+    name: 'sobre',
+    asyncComponent: () => import('./pages/sobre.js'),
+  },
+  {
     path: '/wallet',
     name: 'wallet',
     asyncComponent: () => import('./pages/wallet.js'),
