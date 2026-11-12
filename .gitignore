@@ -1,0 +1,84 @@
+# Dependências
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+build/
+*.local
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads locais (não versionar — mas manter estrutura de pastas)
+backend/uploads/**
+!backend/uploads/**/
+!backend/uploads/**/.gitkeep
+backend/uploads_private/**
+!backend/uploads_private/**/
+!backend/uploads_private/**/.gitkeep
+
+# Capturas de ecrã geradas pelos testes (artefactos, não código)
+frontend/tests/screenshots/
+frontend/test-results/
+
+# ============================================================
+# Android / Capacitor
+# ============================================================
+# Build do Gradle e caches (gerados, nunca versionar)
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+frontend/android/capacitor-cordova-android-plugins/build/
+frontend/android/local.properties
+frontend/android/.idea/
+frontend/android/app/src/main/assets/public/
+frontend/android/app/src/main/assets/capacitor.config.json
+frontend/android/app/src/main/assets/capacitor.plugins.json
+frontend/android/.kotlin/
+*.iml
+
+# Chaves de assinatura — NUNCA versionar
+*.keystore
+*.jks
+keystore.properties
+frontend/android/app/release.jks
+
+# APKs/AABs e pasta de download local
+*.apk
+*.aab
+apk-output/
+frontend/apk-output/
+
+# ============================================================
+# Logs e temporários
+# ============================================================
+*.log
+logs/
+.temp/
+*.tsbuildinfo
+
+# ============================================================
+# Ambiente — manter apenas os exemplos
+# ============================================================
+!frontend/.env.development
+!frontend/.env.production.example
+!backend/.env.example

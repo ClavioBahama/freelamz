@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  APENAS builds de DEBUG (assembleDebug).
+  Permite HTTP em texto simples para testar o backend por IP local
+  na mesma Wi-Fi (ex.: http://192.168.1.10:3000/api).
+  O build de RELEASE não inclui este ficheiro e exige HTTPS.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:usesCleartextTraffic="true" />
+</manifest>

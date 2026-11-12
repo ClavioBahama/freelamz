@@ -1,0 +1,31 @@
+{
+  "name": "freelamz-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend do marketplace FreelaMZ - Framework7 + Vite",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "e2e": "node tests/e2e.js",
+    "smoke:build": "node tests/build-smoke.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "chart.js": "^4.6.1",
+    "framework7": "^8.3.3",
+    "framework7-icons": "^5.0.5",
+    "swiper": "^11.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.0",
+    "@vitejs/plugin-legacy": "^5.2.0",
+    "playwright": "^1.65.0",
+    "vite": "^5.3.0"
+  }
+}

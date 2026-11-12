@@ -1,0 +1,135 @@
+name: Build APK
+
+# Pode ser iniciado manualmente (Actions > Build APK > Run workflow)
+# ou automaticamente ao criar uma tag, ex.: git tag v1.0.0 && git push origin v1.0.0
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug:
+    name: APK de debug
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Preparar Java 21 (exigido pelo Capacitor 8)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Verificar VITE_API_URL
+        run: |
+          if [ -z "${{ vars.VITE_API_URL }}" ]; then
+            echo "::error::Falta a variável VITE_API_URL. Vá a Settings > Secrets and variables > Actions > Variables e crie VITE_API_URL com a URL do backend (ex.: https://api.exemplo.com/api)."
+            exit 1
+          fi
+          echo "A usar VITE_API_URL=${{ vars.VITE_API_URL }}"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build do frontend
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run build
+
+      - name: Sincronizar Capacitor
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npx cap sync android
+
+      - name: Cache do Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Tornar o gradlew executável
+        run: chmod +x android/gradlew
+
+      - name: Compilar APK de debug
+        run: cd android && ./gradlew assembleDebug --no-daemon
+
+      - name: Publicar o APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: freelamz-apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+  # ==========================================================================
+  # OPCIONAL — APK/AAB ASSINADO PARA A PLAY STORE (deixar comentado até ser preciso)
+  # ==========================================================================
+  # Uma keystore é a "identidade" da app: se for perdida, NÃO consegue publicar
+  # atualizações da mesma app na Play Store. NUNCA a envie para o repositório.
+  # Guarde-a em local seguro e nos GitHub Secrets (Settings > Secrets and
+  # variables > Actions > Secrets), com estes nomes:
+  #   KEYSTORE_BASE64      (ficheiro .jks convertido: base64 -w0 app.jks)
+  #   KEYSTORE_PASSWORD
+  #   KEY_ALIAS
+  #   KEY_PASSWORD
+  #
+  # build-release:
+  #   name: APK/AAB assinado (Play Store)
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: frontend
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '22'
+  #         cache: npm
+  #         cache-dependency-path: frontend/package-lock.json
+  #     - uses: actions/setup-java@v4
+  #       with:
+  #         distribution: temurin
+  #         java-version: '21'
+  #     - name: Reconstruir a keystore a partir do Secret
+  #       working-directory: frontend/android
+  #       env:
+  #         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+  #       run: echo "$KEYSTORE_BASE64" | base64 -d > app/release.jks
+  #     - name: Instalar dependências e sincronizar
+  #       env:
+  #         VITE_API_URL: ${{ vars.VITE_API_URL }}
+  #       run: |
+  #         npm ci
+  #         npm run build
+  #         npx cap sync android
+  #     - name: Compilar AAB assinado
+  #       working-directory: frontend/android
+  #       env:
+  #         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  #         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  #         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+  #       run: |
+  #         chmod +x gradlew
+  #         ./gradlew bundleRelease --no-daemon \
+  #           -Pandroid.injected.signing.store.file="$PWD/app/release.jks" \
+  #           -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+  #           -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+  #           -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: freelamz-aab
+  #         path: frontend/android/app/build/outputs/bundle/release/app-release.aab
+  #         if-no-files-found: error

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B1B3F" />
+    <title>FreelaMZ — Encontre talentos. Encontre oportunidades.</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <!-- Framework7 Icons e CSS do F7 são importados localmente pelo app.js (node_modules) -->
+  </head>
+  <body>
+    <div id="app">
+      <!-- ===== Painel lateral (panel-init: auto-inicialização do F7) ===== -->
+      <div class="panel panel-left panel-cover panel-init">
+        <div class="panel-header">
+          <div class="avatar-initials avatar-sm" id="panel-avatar">?</div>
+          <div>
+            <div class="panel-user-nome" id="panel-nome">FreelaMZ</div>
+            <div class="panel-user-tipo" id="panel-tipo">Bem-vindo</div>
+          </div>
+        </div>
+        <div class="panel-menu">
+          <a href="/dashboard" class="panel-link panel-close"><i class="f7-icons">house</i><span>Dashboard</span></a>
+          <a href="/home" class="panel-link panel-close"><i class="f7-icons">compass</i><span>Explorar</span></a>
+          <a href="/freelancers" class="panel-link panel-close"><i class="f7-icons">person_2</i><span>Freelancers</span></a>
+          <a href="/services" class="panel-link panel-close"><i class="f7-icons">briefcase</i><span>Serviços</span></a>
+          <a href="/projects" class="panel-link panel-close"><i class="f7-icons">doc_text</i><span>Meus Projetos</span></a>
+          <a href="/wallet" class="panel-link panel-close"><i class="f7-icons">creditcard_fill</i><span>Carteira</span></a>
+          <a href="/proposals" class="panel-link panel-close"><i class="f7-icons">paperplane</i><span>Propostas</span></a>
+          <a href="/messages" class="panel-link panel-close"><i class="f7-icons">chat_bubble_fill</i><span>Mensagens</span></a>
+          <a href="/notifications" class="panel-link panel-close"><i class="f7-icons">bell</i><span>Notificações</span></a>
+          <a href="/favorites" class="panel-link panel-close"><i class="f7-icons">heart_fill</i><span>Favoritos</span></a>
+          <a href="/profile" class="panel-link panel-close"><i class="f7-icons">person_circle</i><span>Perfil</span></a>
+          <a href="/settings" class="panel-link panel-close"><i class="f7-icons">gear</i><span>Configurações</span></a>
+          <a href="/admin" class="panel-link panel-close" id="panel-admin" style="display:none;"><i class="f7-icons">shield</i><span>Painel Admin</span></a>
+        </div>
+        <div class="panel-footer">
+          <a href="#" class="panel-sair" id="panel-sair"><i class="f7-icons">arrow_right_to_line</i><span>Sair da conta</span></a>
+        </div>
+      </div>
+
+      <!-- ===== View principal (view-init: auto-inicialização do F7) ===== -->
+      <div class="view view-main view-init"></div>
+
+      <!-- ===== Tabbar inferior fixa ===== -->
+      <div class="app-tabbar" id="app-tabbar">
+        <a data-path="/dashboard"><i class="f7-icons">house</i><span>Início</span></a>
+        <a data-path="/freelancers"><i class="f7-icons">person_2</i><span>Freelancers</span></a>
+        <a data-path="/services"><i class="f7-icons">briefcase</i><span>Serviços</span></a>
+        <a data-path="/messages"><i class="f7-icons">chat_bubble_fill</i><span>Mensagens</span><span class="tab-badge" id="tab-badge-msg">0</span></a>
+        <a data-path="/profile"><i class="f7-icons">person_circle</i><span>Perfil</span></a>
+      </div>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
