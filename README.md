@@ -137,29 +137,30 @@ O backend é publicado como um serviço Node.js no [Railway](https://railway.com
 
 ### Variáveis de ambiente (serviço do backend)
 
-| Variável | Valor |
-|----------|-------|
-| `NODE_ENV` | `production` |
-| `JWT_SECRET` | valor aleatório longo (gere localmente, ver abaixo) |
-| `CORS_ORIGINS` | origens web, ex.: `https://freelamz.com` |
-| `ADMIN_EMAIL` | e-mail do administrador |
-| `ADMIN_PASSWORD` | senha forte (mínimo 8 caracteres) |
-| `DB_SSL` | `true` (MySQL gerido) |
-| `UPLOADS_DIR` | `/app/uploads` (se usar Volume) |
+| Variável | Obrigatória | O que é |
+|----------|-------------|---------|
+| `MYSQL_URL` | **Sim** (ou `DB_*`) | Uma só string com host, porta, utilizador, senha e base. No Railway: `${{MySQL.MYSQL_URL}}`. |
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | Alternativa | Variáveis separadas, caso não queira usar `MYSQL_URL`. |
+| `JWT_SECRET` | **Sim** | Texto aleatório longo que assina os tokens de login. |
+| `NODE_ENV` | **Sim** (recomendado) | `production`. Liga a validação e desliga logs verbosos. |
+| `CORS_ORIGINS` | Sim para o site | Origens web separadas por vírgula. As do APK (`capacitor://localhost`, `http://localhost`, `https://localhost`) já são aceites automaticamente. |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Só para `npm run db:init` | Não são usadas pelo servidor em execução; servem para criar/atualizar o administrador. |
+| `UPLOADS_DIR` / `UPLOADS_PRIVATE_DIR` | Opcional | Só com Volume: `/app/uploads` e `/app/uploads_private`. |
+| `DB_SSL` | Só com URL pública | `true` quando liga ao MySQL pela URL pública (por exemplo, a partir do PC). |
+| `PORT` | Automática | O Railway define-a; não precisa de a criar. |
 
 A ligação ao MySQL pode ser feita de duas formas:
 
-1. **Automática (recomendada):** referenciar as variáveis do serviço MySQL no painel do Railway:
-   `DB_HOST=${{MySQL.MYSQLHOST}}`, `DB_PORT=${{MySQL.MYSQLPORT}}`, `DB_USER=${{MySQL.MYSQLUSER}}`,
+1. **Uma só string (recomendada):** `MYSQL_URL=${{MySQL.MYSQL_URL}}` — cobre host, porta, utilizador, senha e base.
+2. **Separadas:** `DB_HOST=${{MySQL.MYSQLHOST}}`, `DB_PORT=${{MySQL.MYSQLPORT}}`, `DB_USER=${{MySQL.MYSQLUSER}}`,
    `DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}`, `DB_NAME=${{MySQL.MYSQLDATABASE}}`.
-2. **Uma só string:** `MYSQL_URL=${{MySQL.MYSQL_URL}}`.
 
 Se nenhuma for definida, o código também lê `MYSQLHOST`/`MYSQLPORT`/`MYSQLUSER`/`MYSQLPASSWORD`/`MYSQLDATABASE` diretamente (variáveis nativas do Railway).
 
-Gerar um `JWT_SECRET` no PowerShell:
+Gerar um `JWT_SECRET` (Node.js):
 
 ```powershell
-[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
 ### Diagnóstico (health checks)
@@ -178,20 +179,19 @@ No arranque, o servidor:
 ### Criar as tabelas e o administrador
 
 Depois do primeiro deploy, corra o script idempotente **do seu PC**, apontando para o MySQL público do Railway
-(Railway > MySQL > **Connect** > *Public Networking*):
+(Railway > serviço MySQL > **Connect** > *Public Networking*). Copie a **Public URL** para a variável local
+`MYSQL_URL` (a URL inclui a senha; não a cole em chats/commits):
 
 ```powershell
 cd C:\laragon\www\freelamz\backend
-$env:DB_HOST="host-publico.railway.app"
-$env:DB_PORT="12345"
-$env:DB_USER="root"
-$env:DB_PASSWORD="a-password-do-railway"
-$env:DB_NAME="railway"
+$env:MYSQL_URL="mysql://root:SENHA@HOST-PUBLICO:PORTA/railway"
 $env:DB_SSL="true"
 $env:ADMIN_EMAIL="seu@email.com"
 $env:ADMIN_PASSWORD="uma-senha-forte"
 npm run db:init
 ```
+
+Alternativa com variáveis separadas: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (e `DB_SSL=true`).
 
 O `db:init` executa `database/schema.sql`, `database/seed.sql` (categorias + habilidades), as migrações
 e cria/atualiza apenas o utilizador **ADMIN**. Não cria contas de teste.

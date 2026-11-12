@@ -46,8 +46,11 @@ function configDeUrl(url) {
   return {
     host: u.hostname,
     port: u.port ? parseInt(u.port, 10) : 3306,
-    user: decodeURIComponent(u.username || ''),
-    password: decodeURIComponent(u.password || ''),
+    // A URL manda; se algum campo vier vazio, usa as variáveis soltas.
+    user: decodeURIComponent(u.username || '')
+      || process.env.DB_USER || process.env.MYSQLUSER || '',
+    password: decodeURIComponent(u.password || '')
+      || process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '',
     database: database || undefined,
   };
 }
@@ -62,7 +65,16 @@ function validarConfigBanco() {
     try {
       const u = new URL(url);
       if (!u.hostname) problemas.push('MYSQL_URL (sem host)');
+      if (!u.username && !process.env.DB_USER && !process.env.MYSQLUSER) {
+        problemas.push('MYSQL_URL (sem utilizador; defina também DB_USER)');
+      }
       if (!(u.pathname || '').replace(/^\//, '')) problemas.push('MYSQL_URL (sem nome da base)');
+      // Só avisa se a password faltar mesmo depois de considerar a URL
+      // e as variáveis soltas (DB_PASSWORD / MYSQLPASSWORD).
+      if (emProducao() && !u.password
+        && !process.env.DB_PASSWORD && !process.env.MYSQLPASSWORD) {
+        avisos.push('MYSQL_URL não inclui password (e DB_PASSWORD/MYSQLPASSWORD estão vazias)');
+      }
     } catch (e) {
       problemas.push('MYSQL_URL (formato inválido; esperado mysql://user:senha@host:porta/base)');
     }
