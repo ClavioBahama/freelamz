@@ -348,7 +348,7 @@ export function aplicarNavbarAvatar() {
 /* Liga cliques globais: panel links, tabbar, botões da navbar, sair */
 export function ligarNavegacaoGlobal(app) {
   // Links do painel (href) — navega e fecha
-  document.querySelectorAll('.panel-menu .panel-link').forEach((a) => {
+  document.querySelectorAll('.panel .panel-link').forEach((a) => {
     a.addEventListener('click', (e) => {
       e.preventDefault();
       const href = a.getAttribute('href');
