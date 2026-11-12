@@ -115,7 +115,8 @@ npm ci
 npm start                       # http://localhost:3000
 ```
 
-Verifique `http://localhost:3000/api/health` → `{"success":true,"name":"FreelaMZ API","status":"ok"}`.
+Verifique `http://localhost:3000/api/health` → `{"success":true,"name":"FreelaMZ API","status":"ok","db":"up"}`.
+O estado da base de dados é `http://localhost:3000/api/health/db`.
 
 ---
 
@@ -160,6 +161,19 @@ Gerar um `JWT_SECRET` no PowerShell:
 ```powershell
 [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
 ```
+
+### Diagnóstico (health checks)
+
+| Endpoint | Comportamento |
+|----------|---------------|
+| `GET /api/health` | Responde **sempre 200** com `{"success":true,...,"db":"up"\|"down"}` — o Railway não mata o serviço por causa da BD. |
+| `GET /api/health/db` | Testa a BD agora: `200` com `db:"up"`, ou `503` com `db:"down"`, o código do erro (`ECONNREFUSED`, `ER_ACCESS_DENIED_ERROR`, `ENOTFOUND`…) e a configuração usada (sem password). |
+
+No arranque, o servidor:
+
+1. valida as variáveis obrigatórias e, se faltar alguma, **lista os nomes em falta** nos logs e termina;
+2. sobe primeiro o HTTP e só depois liga à BD, com **5 tentativas** (1s, 2s, 4s, 8s);
+3. se a BD continuar indisponível, **continua online** e mostra `db:"down"` — corrige as variáveis e faz Redeploy.
 
 ### Criar as tabelas e o administrador
 

@@ -30,7 +30,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
-const { opcoesMysql, obterConfigBanco, resumoConfig } = require('../src/config/dbConfig');
+const { opcoesMysql, obterConfigBanco, resumoConfig, validarConfigBanco } = require('../src/config/dbConfig');
 
 function falhar(msg) {
   console.error('[DB:INIT] ERRO:', msg);
@@ -85,6 +85,17 @@ function correrMigrate() {
 
 async function main() {
   const admin = validarAdmin();
+
+  const validacao = validarConfigBanco();
+  if (!validacao.ok) {
+    falhar(
+      'faltam variáveis de ambiente da base de dados:\n  - '
+      + validacao.problemas.join('\n  - ')
+      + '\n  Defina-as no PowerShell ($env:DB_HOST=...) ou no backend/.env.'
+    );
+  }
+  for (const aviso of validacao.avisos) console.warn('[DB:INIT] AVISO:', aviso);
+
   const cfg = obterConfigBanco();
   console.log('[DB:INIT] Destino:', resumoConfig(cfg));
 

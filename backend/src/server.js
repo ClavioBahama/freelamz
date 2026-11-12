@@ -5,18 +5,46 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const { testarConexao } = require('./config/db');
+const { emProducao } = require('./config/ambiente');
+const { validarConfigBanco, resumoConfig } = require('./config/dbConfig');
+const {
+  testarConexao, verificarBanco, estadoBanco, configBanco,
+} = require('./config/db');
 const { UPLOADS_DIR, garantirPastas } = require('./config/paths');
 
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = '0.0.0.0';
-const EM_PRODUCAO = process.env.NODE_ENV === 'production';
+const EM_PRODUCAO = emProducao();
 const VERBOSO = !EM_PRODUCAO || process.env.LOG_VERBOSE === 'true';
 
 /* Atrás do proxy do Railway (HTTPS terminado à frente). */
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
+
+/* ============================================================
+   Validação do ambiente ANTES de arrancar.
+   Lista apenas os NOMES das variáveis em falta (nunca valores).
+   ============================================================ */
+function validarArranque() {
+  const { problemas, avisos } = validarConfigBanco();
+  const faltando = [...problemas];
+
+  if (EM_PRODUCAO && !process.env.JWT_SECRET) {
+    faltando.push('JWT_SECRET');
+  }
+
+  for (const aviso of avisos) console.warn('[CONFIG] AVISO:', aviso);
+
+  if (faltando.length) {
+    console.error('[CONFIG] ERRO: faltam variáveis de ambiente obrigatórias:');
+    for (const nome of faltando) console.error('  -', nome);
+    console.error('[CONFIG] Defina-as no Railway > serviço > Variables (nunca no código).');
+    console.error('[CONFIG] Atalho: MYSQL_URL=${{MySQL.MYSQL_URL}} cobre toda a ligação à BD.');
+    console.error('[CONFIG] Arranque cancelado.');
+    process.exit(1);
+  }
+}
 
 /* ---------- CORS por variável de ambiente ----------
    CORS_ORIGINS = lista separada por vírgulas.
@@ -50,8 +78,14 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-/* Ficheiros públicos (avatares, capas, portfólio, imagens de serviços). */
-garantirPastas();
+/* Ficheiros públicos (avatares, capas, portfólio, imagens de serviços).
+   Se a pasta não puder ser criada, avisamos mas NÃO derrubamos o servidor. */
+try {
+  garantirPastas();
+} catch (e) {
+  console.warn('[API] AVISO: não foi possível preparar as pastas de uploads:', e.message);
+  console.warn('[API] Definir UPLOADS_DIR para uma pasta com permissões de escrita.');
+}
 app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: EM_PRODUCAO ? '7d' : 0 }));
 
 /* Página raiz da API */
@@ -59,9 +93,35 @@ app.get('/', (req, res) => {
   res.json({ success: true, name: 'FreelaMZ API', status: 'ok' });
 });
 
-/* Health check (usado pelo Railway e pelos testes) */
+/* Health check do Railway: responde SEMPRE 200, mesmo sem BD.
+   Assim o serviço não é morto e o motivo fica visível em /api/health/db. */
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, name: 'FreelaMZ API', status: 'ok' });
+  res.json({
+    success: true,
+    name: 'FreelaMZ API',
+    status: 'ok',
+    db: estadoBanco.online ? 'up' : 'down',
+  });
+});
+
+/* Health da base de dados: testa a ligação agora. */
+app.get('/api/health/db', async (req, res) => {
+  const r = await verificarBanco();
+  if (r.ok) {
+    return res.json({
+      success: true,
+      db: 'up',
+      host: configBanco.host || '(não definido)',
+      database: configBanco.database || '(não definida)',
+    });
+  }
+  return res.status(503).json({
+    success: false,
+    db: 'down',
+    erro: r.code || 'ERRO',
+    mensagem: r.message || 'Sem ligação à base de dados',
+    config: resumoConfig(configBanco),
+  });
 });
 
 /* Rotas da API */
@@ -100,13 +160,24 @@ app.use((err, req, res, next) => {
 });
 
 /* ---------- Arranque ---------- */
+let lembretesIniciados = false;
+
+function iniciarLembretes() {
+  if (lembretesIniciados) return;
+  lembretesIniciados = true;
+
+  /* FASE A: lembretes de cliente silente (só NOTIFICAM — o escrow
+     nunca é liberado automaticamente). A cada 6h, falhas silenciosas. */
+  const { lembretesAutoRelease } = require('./services/finance');
+  const avisoLembretes = setInterval(() => {
+    lembretesAutoRelease().catch(() => { /* silencioso */ });
+  }, 6 * 60 * 60 * 1000);
+  avisoLembretes.unref();
+  lembretesAutoRelease().catch(() => { /* silencioso no arranque */ });
+}
+
 async function iniciar() {
-  try {
-    await testarConexao();
-  } catch (e) {
-    console.error('[API] Arranque cancelado: base de dados indisponível.');
-    process.exit(1);
-  }
+  validarArranque();
 
   const servidor = app.listen(PORT, HOST, () => {
     if (VERBOSO) {
@@ -114,18 +185,36 @@ async function iniciar() {
       console.log(`[API] Uploads públicos: ${UPLOADS_DIR}`);
       console.log(`[API] Origens CORS: ${origensPermitidas.join(', ')}`);
     } else {
-      console.log(`[API] FreelaMZ pronta na porta ${PORT}`);
+      console.log(`[API] FreelaMZ pronta na porta ${PORT} (ambiente: produção)`);
     }
   });
 
-  /* FASE A: lembretes de cliente silente (só NOTIFICAM — o escrow
-     nunca é liberado automaticamente). A cada 6h, falhas silenciosas. */
-  const { lembretesAutoRelease } = require('./services/finance');
-  const avisoLembretes = setInterval(async () => {
-    try { await lembretesAutoRelease(); } catch (e) { /* silencioso */ }
-  }, 6 * 60 * 60 * 1000);
-  avisoLembretes.unref();
-  lembretesAutoRelease().catch(() => { /* silencioso no arranque */ });
+  servidor.on('error', (err) => {
+    console.error('[API] ERRO ao abrir a porta', PORT, '—', err.code || '', err.message);
+    process.exit(1);
+  });
+
+  /* Liga à BD DEPOIS de o servidor estar a ouvir:
+     /api/health responde sempre, mesmo que a BD esteja em baixo. */
+  const resultado = await testarConexao({ tentativas: 5 });
+
+  if (resultado.ok) {
+    iniciarLembretes();
+  } else {
+    console.error('[API] A API continua online, mas SEM base de dados.');
+    console.error('[API] Diagnóstico: GET /api/health/db');
+    console.error('[API] Corrija as variáveis no Railway e faça Redeploy.');
+  }
+
+  /* Revalida a cada 60s: se a BD voltar, os lembretes arrancam sozinhos. */
+  const revalidar = setInterval(async () => {
+    const r = await verificarBanco();
+    if (r.ok && !lembretesIniciados) {
+      console.log('[DB] Ligação restabelecida.');
+      iniciarLembretes();
+    }
+  }, 60 * 1000);
+  revalidar.unref();
 
   /* Encerramento limpo (Railway envia SIGTERM nos deploys). */
   const fechar = () => {
