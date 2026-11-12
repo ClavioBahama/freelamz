@@ -26,6 +26,10 @@ const { opcoesMysql, obterConfigBanco, resumoConfig, validarConfigBanco } = requ
 const SENHA = String(process.env.DEMO_PASSWORD || 'Demo1234');
 const DOMINIO = 'demo.freelamz.mz';
 const LIMPAR = process.argv.includes('--limpar');
+/* Quando executado por `npm run db:demo` sai com código 1 em erro;
+   quando chamado pelo servidor (SEED_DEMO=true) lança o erro em vez
+   de matar o processo. */
+const CLI = require.main === module;
 
 /* Categorias por nome (os ids são resolvidos na base de dados). */
 const FREELANCERS = [
@@ -147,6 +151,7 @@ const CLIENTES = [
 ];
 
 function falhar(msg) {
+  if (!CLI) throw new Error(msg);
   console.error('[DEMO] ERRO:', msg);
   process.exit(1);
 }
@@ -275,7 +280,11 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error('[DEMO] Falhou:', err.code || '', err.message);
-  process.exit(1);
-});
+if (CLI) {
+  main().catch((err) => {
+    console.error('[DEMO] Falhou:', err.code || '', err.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { main, DOMINIO };

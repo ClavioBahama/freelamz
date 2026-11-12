@@ -198,7 +198,20 @@ e cria/atualiza apenas o utilizador **ADMIN**. Não cria contas de teste.
 
 ### Dados de demonstração (opcional)
 
-Para a aplicação não aparecer vazia (freelancers + serviços de exemplo):
+#### Forma mais simples: no próprio Railway (sem copiar URL nem senha)
+
+1. Railway → serviço **backend** → **Variables** → **New Variable**:
+   - Nome: `SEED_DEMO`
+   - Valor: `true`
+2. O Railway faz **Redeploy** automático. Nos logs aparece:
+   `[DEMO] Contas criadas agora: 10 | já existiam: 0`
+3. Depois de confirmar os dados na app, podes **remover** a variável `SEED_DEMO`
+   (ou pôr `false`) — o seed é idempotente, mas assim fica desligado.
+
+O servidor usa a `MYSQL_URL` interna do Railway; não é preciso ativar o
+Public Networking do MySQL.
+
+#### Alternativa: a partir do PC (requer Public Networking)
 
 ```powershell
 cd C:\laragon\www\freelamz\backend
@@ -206,6 +219,10 @@ $env:MYSQL_URL="mysql://root:SENHA@HOST-PUBLICO:PORTA/railway"
 $env:DB_SSL="true"
 npm run db:demo
 ```
+
+> ⚠️ Confirma que `$env:MYSQL_URL` está mesmo definido antes de correr:
+> `[uri]$env:MYSQL_URL` tem de mostrar `host=` e `porta=` preenchidos.
+> Se estiverem vazios, o script liga-se ao MySQL **local** (`127.0.0.1`).
 
 Cria **8 freelancers + 2 clientes** (e-mails `@demo.freelamz.mz`) com perfil, habilidades e serviços.
 É idempotente (repetir não duplica). A senha de todas as contas demo é `Demo1234`; para outra:

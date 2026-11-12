@@ -176,6 +176,30 @@ function iniciarLembretes() {
   lembretesAutoRelease().catch(() => { /* silencioso no arranque */ });
 }
 
+/* ---------- Dados de demonstração opcionais ----------
+   Com SEED_DEMO=true no Railway, o próprio servidor cria os
+   freelancers/serviços de exemplo usando a MYSQL_URL interna.
+   Assim não é preciso copiar a URL pública nem a senha. */
+let demoSeedFeito = false;
+
+function semearDemoSePedido() {
+  if (demoSeedFeito) return;
+  if (String(process.env.SEED_DEMO || '').toLowerCase() !== 'true') return;
+  demoSeedFeito = true;
+  const { main: semearDemo } = require('../scripts/demo-seed');
+  console.log('[DEMO] SEED_DEMO=true — a criar dados de demonstração…');
+  semearDemo()
+    .then(() => {
+      console.log('[DEMO] Dados de demonstração prontos.');
+      console.log('[DEMO] Pode remover a variável SEED_DEMO (ou definir false).');
+    })
+    .catch((err) => {
+      console.error('[DEMO] Falhou:', err.code || '', err.message);
+      console.error('[DEMO] Será tentado de novo quando a base de dados responder.');
+      demoSeedFeito = false;
+    });
+}
+
 async function iniciar() {
   validarArranque();
 
@@ -200,6 +224,7 @@ async function iniciar() {
 
   if (resultado.ok) {
     iniciarLembretes();
+    semearDemoSePedido();
   } else {
     console.error('[API] A API continua online, mas SEM base de dados.');
     console.error('[API] Diagnóstico: GET /api/health/db');
@@ -213,6 +238,7 @@ async function iniciar() {
       console.log('[DB] Ligação restabelecida.');
       iniciarLembretes();
     }
+    if (r.ok) semearDemoSePedido();
   }, 60 * 1000);
   revalidar.unref();
 
