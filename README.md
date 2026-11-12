@@ -4,6 +4,10 @@ Marketplace de freelancers focado em Moçambique. Encontre talentos. Encontre op
 
 **Stack:** Framework7 (Vite) · Node.js · Express · MySQL · JWT + bcrypt · Multer
 
+**Documentação:**
+- [Relatório completo do projeto](RELATORIO.md) — o que foi feito, passo a passo, problemas e soluções
+- [Apresentação em PDF](docs/FreelaMZ-Apresentacao.pdf) — 14 slides + roteiro de fala (fonte: [docs/apresentacao.html](docs/apresentacao.html))
+
 ---
 
 ## 0. Pré-requisitos (Laragon)

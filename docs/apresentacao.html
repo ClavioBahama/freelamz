@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<title>FreelaMZ — Apresentação</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Segoe UI Variable", system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 13.333in;
+    height: 7.5in;
+    padding: 0.55in 0.7in;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+    background: #f5f7fb;
+    display: flex;
+    flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  /* ---------- decoração ---------- */
+  .blob {
+    position: absolute; border-radius: 50%; pointer-events: none;
+  }
+  .blob-a {
+    width: 5.2in; height: 5.2in; right: -1.9in; top: -2.2in;
+    background: radial-gradient(circle, rgba(37,99,235,0.16), transparent 68%);
+  }
+  .blob-b {
+    width: 4in; height: 4in; left: -1.7in; bottom: -2in;
+    background: radial-gradient(circle, rgba(255,122,24,0.12), transparent 68%);
+  }
+
+  /* ---------- capa / secções escuras ---------- */
+  .dark {
+    background: #0b1b3f;
+    color: #ffffff;
+  }
+  .dark::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 88% 12%, rgba(37,99,235,0.55), transparent 55%),
+      radial-gradient(circle at 10% 92%, rgba(255,122,24,0.30), transparent 55%);
+  }
+  .dark > * { position: relative; }
+
+  .logo-badge {
+    width: 0.92in; height: 0.92in;
+    border-radius: 0.28in;
+    background: linear-gradient(135deg, #2563eb, #12295e);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.46in;
+    box-shadow: 0 18px 40px rgba(37,99,235,0.35);
+  }
+
+  .kicker {
+    font-size: 13px; font-weight: 800; letter-spacing: 2.4px;
+    text-transform: uppercase; color: #2563eb;
+    margin: 0 0 10px 0;
+  }
+  .dark .kicker { color: #93c5fd; }
+
+  h1 {
+    font-size: 44px; line-height: 1.08; letter-spacing: -1.2px;
+    margin: 0 0 14px 0; color: #0b1b3f; font-weight: 900;
+  }
+  .dark h1 { color: #ffffff; }
+  h2 {
+    font-size: 25px; line-height: 1.2; letter-spacing: -0.4px;
+    margin: 0 0 10px 0; color: #0b1b3f; font-weight: 800;
+  }
+  p { margin: 0; }
+  .lead { font-size: 19px; line-height: 1.55; color: #475569; }
+  .dark .lead { color: #cbd5e1; }
+
+  .footer {
+    position: absolute; left: 0.7in; right: 0.7in; bottom: 0.3in;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: #94a3b8; letter-spacing: 0.3px;
+  }
+  .dark .footer { color: rgba(255,255,255,0.55); }
+  .footer b { color: #64748b; font-weight: 700; }
+  .dark .footer b { color: rgba(255,255,255,0.8); }
+
+  /* ---------- grelhas ---------- */
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 20px 20px 18px 20px;
+    box-shadow: 0 10px 26px rgba(15,23,42,0.05);
+  }
+  .card h3 {
+    margin: 0 0 6px 0; font-size: 18px; font-weight: 800; color: #0b1b3f;
+    letter-spacing: -0.2px;
+  }
+  .card p { font-size: 14.5px; line-height: 1.5; color: #64748b; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #eef4ff; color: #1d4ed8;
+    border-radius: 999px; padding: 8px 14px;
+    font-size: 14px; font-weight: 700;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .num {
+    width: 34px; height: 34px; border-radius: 11px;
+    background: linear-gradient(135deg, #2563eb, #12295e);
+    color: #fff; font-weight: 900; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .big-stat { font-size: 52px; font-weight: 900; color: #2563eb; line-height: 1; letter-spacing: -2px; }
+  .stat-label { font-size: 13.5px; color: #64748b; margin-top: 6px; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th {
+    text-align: left; font-size: 11.5px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #94a3b8; padding: 0 12px 8px 12px; border-bottom: 1px solid #e2e8f0;
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid #eef2f7; color: #334155; vertical-align: top; }
+  td:first-child { font-weight: 700; color: #0b1b3f; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---------- diagrama ---------- */
+  .flow { display: flex; align-items: center; gap: 12px; }
+  .box {
+    flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 16px; text-align: center; box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+  }
+  .box .ico { font-size: 26px; margin-bottom: 6px; }
+  .box b { display: block; font-size: 15px; color: #0b1b3f; margin-bottom: 3px; }
+  .box span { font-size: 12.5px; color: #64748b; }
+  .arrow { font-size: 26px; color: #94a3b8; font-weight: 300; }
+
+  .steps { display: flex; gap: 12px; }
+  .step {
+    flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 16px 14px; position: relative;
+  }
+  .step .n {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #2563eb; color: #fff; font-weight: 900; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+  .step b { display: block; font-size: 14.5px; color: #0b1b3f; margin-bottom: 4px; }
+  .step span { font-size: 12.5px; color: #64748b; line-height: 1.4; display: block; }
+
+  /* ---------- roteiro ---------- */
+  .rot { background: #ffffff; }
+  .rot-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 16px;
+  }
+  .rot-head h2 { font-size: 22px; margin: 0; }
+  .rot-head span { font-size: 12px; color: #94a3b8; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .rot-block { margin-bottom: 14px; }
+  .rot-block h4 {
+    margin: 0 0 3px 0; font-size: 14px; color: #1d4ed8; font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+  .rot-block p { font-size: 13.5px; line-height: 1.55; color: #334155; }
+  .rot-block .t { color: #94a3b8; font-weight: 600; font-size: 12px; }
+  .note {
+    background: #f1f5f9; border-left: 4px solid #2563eb; border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; color: #475569; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 1. CAPA ================= -->
+<section class="slide dark" style="justify-content: center;">
+  <div style="display:flex; align-items:center; gap:0.45in; margin-bottom: 0.5in;">
+    <div class="logo-badge">✨</div>
+    <div>
+      <div style="font-size:13px; letter-spacing:3px; text-transform:uppercase; color:#93c5fd; font-weight:800;">Apresentação do projeto</div>
+      <div style="font-size:15px; color:#cbd5e1; margin-top:4px;">Marketplace de talentos moçambicanos</div>
+    </div>
+  </div>
+
+  <h1 style="font-size:92px; letter-spacing:-3px; margin-bottom:10px;">FreelaMZ</h1>
+  <p class="lead" style="font-size:24px; max-width:9in;">
+    Encontre talentos. Encontre oportunidades.
+  </p>
+
+  <div style="margin-top:0.55in; display:flex; gap:14px; align-items:center;">
+    <span class="chip" style="background:rgba(255,255,255,0.12); color:#fff;">Versão 1.0.0</span>
+    <span class="chip" style="background:rgba(255,255,255,0.12); color:#fff;">Android · Web · API</span>
+    <span class="chip" style="background:rgba(255,255,255,0.12); color:#fff;">Online no Railway</span>
+  </div>
+
+  <div style="margin-top:0.7in; font-size:16px; color:#e2e8f0;">
+    <b style="color:#fff;">Clávio Alfredo Chitsulete</b><br />
+    Idealizador e programador · Maputo, Moçambique · 2026
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Apresentação</span><span>1 / 14</span></div>
+</section>
+
+<!-- ================= 2. PROBLEMA ================= -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">O problema</p>
+  <h1>Há talento.<br />Falta um lugar para o encontrar.</h1>
+  <p class="lead" style="max-width:10in; margin-bottom:0.35in;">
+    Em Moçambique há programadores, designers, redatores, fotógrafos e contabilistas.
+    Mas quem precisa deles encontra-os quase sempre por indicação ou em grupos de WhatsApp.
+  </p>
+
+  <div class="grid g3">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Procura dispersa</h3>
+      <p>O cliente não sabe onde procurar e perde dias a perguntar a conhecidos.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Sem reputação</h3>
+      <p>Não há histórico nem avaliações para comparar profissionais antes de contratar.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Sem acordo seguro</h3>
+      <p>Preço, prazo e entrega ficam combinados de forma informal, sem registo.</p>
+    </div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · O problema</span><span>2 / 14</span></div>
+</section>
+
+<!-- ================= 3. SOLUÇÃO ================= -->
+<section class="slide">
+  <div class="blob blob-b"></div>
+  <p class="kicker">A solução</p>
+  <h1>Um só lugar para contratar<br />e ser contratado.</h1>
+  <p class="lead" style="max-width:10in; margin-bottom:0.3in;">
+    Do primeiro contacto ao pagamento, com histórico, reputação e tudo registado.
+  </p>
+
+  <div class="grid g3" style="gap:14px;">
+    <div class="card"><h3>🛠 Serviços</h3><p>O freelancer publica o que faz, com preço e prazo.</p></div>
+    <div class="card"><h3>📩 Propostas</h3><p>O cliente envia uma proposta e negoceia o valor.</p></div>
+    <div class="card"><h3>📁 Projetos</h3><p>O trabalho tem estados: em andamento, entregue, concluído.</p></div>
+    <div class="card"><h3>💬 Mensagens</h3><p>Conversa dentro da plataforma, sem perder o contexto.</p></div>
+    <div class="card"><h3>💳 Carteira e escrow</h3><p>Pagamentos simulados (M-Pesa/e-Mola) e saldo controlado.</p></div>
+    <div class="card"><h3>⭐ Avaliações</h3><p>No fim, a reputação fica construída e visível.</p></div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · A solução</span><span>3 / 14</span></div>
+</section>
+
+<!-- ================= 4. PARA QUEM ================= -->
+<section class="slide">
+  <p class="kicker">Para quem</p>
+  <h1>Três tipos de utilizador,<br />um único fluxo.</h1>
+
+  <div class="grid g3" style="margin-top:0.15in;">
+    <div class="card" style="border-top:5px solid #2563eb;">
+      <h3>Cliente</h3>
+      <p style="color:#334155;">Procura um serviço, compara perfis e avaliações, envia propostas, acompanha o projeto e paga com segurança.</p>
+      <p style="margin-top:10px; color:#2563eb; font-weight:700; font-size:13px;">Ex.: loja de roupa, empresa de logística</p>
+    </div>
+    <div class="card" style="border-top:5px solid #10b981;">
+      <h3>Freelancer</h3>
+      <p style="color:#334155;">Tem uma vitrine com portfólio, serviços e preços, recebe propostas, entrega o trabalho e constrói reputação.</p>
+      <p style="margin-top:10px; color:#059669; font-weight:700; font-size:13px;">Ex.: programador, designer, fotógrafa</p>
+    </div>
+    <div class="card" style="border-top:5px solid #ff7a18;">
+      <h3>Administrador</h3>
+      <p style="color:#334155;">Gere utilizadores, serviços e disputas; mantém a plataforma organizada e segura.</p>
+      <p style="margin-top:10px; color:#ea580c; font-weight:700; font-size:13px;">Painel próprio dentro da app</p>
+    </div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Público</span><span>4 / 14</span></div>
+</section>
+
+<!-- ================= 5. COMO FUNCIONA ================= -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Como funciona</p>
+  <h1>O percurso real de um trabalho.</h1>
+  <p class="lead" style="margin-bottom:0.3in;">A plataforma replica o que já acontece — mas organizado e registado.</p>
+
+  <div class="steps">
+    <div class="step"><div class="n">1</div><b>Publicar</b><span>O freelancer cria o serviço com preço e prazo.</span></div>
+    <div class="step"><div class="n">2</div><b>Propor</b><span>O cliente envia uma proposta com o valor que pretende pagar.</span></div>
+    <div class="step"><div class="n">3</div><b>Combinar</b><span>O freelancer aceita e o projeto é criado.</span></div>
+    <div class="step"><div class="n">4</div><b>Entregar</b><span>O trabalho é entregue e aprovado pelo cliente.</span></div>
+    <div class="step"><div class="n">5</div><b>Avaliar</b><span>O pagamento é libertado e fica a avaliação.</span></div>
+  </div>
+
+  <div class="card" style="margin-top:0.3in; background:#eef4ff; border-color:#dbeafe;">
+    <p style="font-size:15px; color:#1e3a8a; line-height:1.55;">
+      <b>Regra de ouro:</b> nada avança por fora da plataforma. Cada passo deixa registo —
+      quem propôs, quanto, quando entregou e que nota recebeu.
+    </p>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Fluxo</span><span>5 / 14</span></div>
+</section>
+
+<!-- ================= 6. ARQUITETURA ================= -->
+<section class="slide">
+  <p class="kicker">Arquitetura</p>
+  <h1>Uma API, três formas de chegar a ela.</h1>
+
+  <div class="flow" style="margin-top:0.25in;">
+    <div class="box">
+      <div class="ico">📱</div>
+      <b>App Android</b>
+      <span>React + Framework7<br />empacotado com Capacitor</span>
+    </div>
+    <div class="arrow">⇄</div>
+    <div class="box">
+      <div class="ico">⚙️</div>
+      <b>API REST</b>
+      <span>Node.js + Express<br />JWT + bcrypt</span>
+    </div>
+    <div class="arrow">⇄</div>
+    <div class="box">
+      <div class="ico">🗄️</div>
+      <b>MySQL</b>
+      <span>Base gerida no Railway<br />utf8mb4</span>
+    </div>
+  </div>
+
+  <div class="grid g3" style="margin-top:0.3in;">
+    <div class="card"><h3>Interface</h3><p>React 18 + Framework7 8 + Vite. Aspecto de app nativa, com navegação por rotas.</p></div>
+    <div class="card"><h3>Servidor</h3><p>Express com rotas por domínio: auth, users, services, proposals, projects, messages, payments.</p></div>
+    <div class="card"><h3>Dados</h3><p>15 tabelas: utilizadores, perfis, serviços, projetos, mensagens, carteiras, avaliações.</p></div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Arquitetura</span><span>6 / 14</span></div>
+</section>
+
+<!-- ================= 7. PUBLICAÇÃO ================= -->
+<section class="slide">
+  <div class="blob blob-b"></div>
+  <p class="kicker">Publicação</p>
+  <h1>Do portátil para a internet<br />em poucos minutos.</h1>
+
+  <div class="grid g2" style="margin-top:0.2in;">
+    <div class="card">
+      <h3>Railway — backend</h3>
+      <p style="line-height:1.7;">
+        • Root Directory: <b>/backend</b><br />
+        • Builder <b>RAILPACK</b> · start <b>npm start</b><br />
+        • Healthcheck: <b>/api/health</b><br />
+        • Reinício automático em falha
+      </p>
+    </div>
+    <div class="card">
+      <h3>Variáveis (sem segredos no código)</h3>
+      <p style="line-height:1.7;">
+        • <b>MYSQL_URL</b> = referência interna do MySQL<br />
+        • <b>JWT_SECRET</b> · <b>NODE_ENV</b> · <b>CORS_ORIGINS</b><br />
+        • <b>SEED_DEMO</b> para dados de exemplo
+      </p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:0.25in; background:#0b1b3f; border-color:#0b1b3f;">
+    <p style="color:#93c5fd; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:800; margin-bottom:6px;">Endereço público</p>
+    <p style="color:#fff; font-size:17px; font-weight:700; letter-spacing:0.2px; word-break:break-all;">
+      https://freelamz-production-7103b885.up.railway.app/api
+    </p>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Publicação</span><span>7 / 14</span></div>
+</section>
+
+<!-- ================= 8. APK ================= -->
+<section class="slide">
+  <p class="kicker">App Android</p>
+  <h1>O APK compila sozinho<br />no GitHub Actions.</h1>
+  <p class="lead" style="margin-bottom:0.25in;">Sem Android Studio, sem instalar SDK: um botão gera a app em 2–4 minutos.</p>
+
+  <div class="steps">
+    <div class="step"><div class="n">1</div><b>Build</b><span>Vite compila o frontend com a URL da API.</span></div>
+    <div class="step"><div class="n">2</div><b>Sync</b><span>Capacitor copia os ficheiros para o projeto Android.</span></div>
+    <div class="step"><div class="n">3</div><b>Gradle</b><span>Java 21 compila o APK de debug.</span></div>
+    <div class="step"><div class="n">4</div><b>Artefacto</b><span>Descarrega-se <b>freelamz-apk</b> e instala-se.</span></div>
+  </div>
+
+  <div class="grid g3" style="margin-top:0.3in;">
+    <div class="card"><div class="big-stat" style="font-size:38px;">4 min</div><div class="stat-label">primeiro build completo</div></div>
+    <div class="card"><div class="big-stat" style="font-size:38px;">3×</div><div class="stat-label">APKs gerados nesta fase</div></div>
+    <div class="card"><div class="big-stat" style="font-size:38px;">0</div><div class="stat-label">software Android no PC</div></div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · APK</span><span>8 / 14</span></div>
+</section>
+
+<!-- ================= 9. DADOS ================= -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Dados</p>
+  <h1>A app deixou de aparecer vazia.</h1>
+
+  <div class="grid g4" style="margin-top:0.15in;">
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">categorias</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">8</div><div class="stat-label">freelancers demo</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">2</div><div class="stat-label">clientes demo</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">serviços publicados</div></div>
+  </div>
+
+  <div class="card" style="margin-top:0.3in;">
+    <h3>Contas de demonstração</h3>
+    <p style="line-height:1.75;">
+      <b>Freelancers:</b> isabel, carlos, beatriz, helder, rosa, amos, luis, marta <b>@demo.freelamz.mz</b><br />
+      <b>Clientes:</b> cliente, empresa <b>@demo.freelamz.mz</b><br />
+      <b>Senha (todas):</b> <b>Demo1234</b>
+    </p>
+  </div>
+
+  <div class="note" style="margin-top:0.25in;">
+    O seed é <b>idempotente</b>: pode correr várias vezes que não duplica nada. No Railway corre
+    no arranque com <b>SEED_DEMO=true</b>, usando a ligação interna — sem copiar URL nem senha.
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Dados</span><span>9 / 14</span></div>
+</section>
+
+<!-- ================= 10. PROBLEMAS ================= -->
+<section class="slide">
+  <p class="kicker">O caminho real</p>
+  <h1>O que correu mal — e como<br />foi resolvido.</h1>
+
+  <table style="margin-top:0.1in;">
+    <thead>
+      <tr><th style="width:30%;">Sintoma</th><th style="width:30%;">Causa</th><th>Solução</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Deploy em ciclo de reinícios</td><td>BD ainda a acordar</td><td>Arranque resiliente, retentativas e health sempre 200</td></tr>
+      <tr><td>App vazia em produção</td><td>Só existiam categorias e admin</td><td>Seed de demonstração idempotente</td></tr>
+      <tr><td>Dados não chegavam ao Railway</td><td>URL da BD vazia na janela local</td><td>Seed automático no servidor (SEED_DEMO)</td></tr>
+      <tr><td>Login cortado no telemóvel</td><td>Altura fixa e falta de safe-area</td><td>CSS com margin:auto, notch e inputs 16px</td></tr>
+      <tr><td>Home exigia login</td><td>Endpoints privados e 401 a expulsar</td><td>Freelancers públicos e 401 condicional</td></tr>
+      <tr><td>“Sobre” não aparecia</td><td>Links escondidos e APK antigo</td><td>Item no menu lateral e APK recompilado</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer"><span>FreelaMZ · Problemas e soluções</span><span>10 / 14</span></div>
+</section>
+
+<!-- ================= 11. SEGURANÇA ================= -->
+<section class="slide">
+  <div class="blob blob-b"></div>
+  <p class="kicker">Segurança e privacidade</p>
+  <h1>O que fica protegido —<br />e o que fica privado.</h1>
+
+  <div class="grid g2" style="margin-top:0.15in;">
+    <div class="card">
+      <h3>Contas</h3>
+      <p style="line-height:1.7;">
+        • Senhas guardadas com <b>bcrypt</b> (nunca em texto)<br />
+        • Sessões com <b>JWT</b> e expiração<br />
+        • Cada pedido valida o token e o tipo de utilizador
+      </p>
+    </div>
+    <div class="card">
+      <h3>Dados públicos</h3>
+      <p style="line-height:1.7;">
+        • Perfis de freelancers visíveis <b>sem login</b><br />
+        • Mas <b>sem email</b> e <b>sem métodos de recebimento</b><br />
+        • Contactos só dentro da plataforma
+      </p>
+    </div>
+    <div class="card">
+      <h3>Segredos</h3>
+      <p style="line-height:1.7;">
+        • Só em variáveis de ambiente (Railway/Actions)<br />
+        • Nunca em commits, chats ou issues<br />
+        • Erros de configuração mostram apenas nomes de variáveis
+      </p>
+    </div>
+    <div class="card">
+      <h3>Comunicação</h3>
+      <p style="line-height:1.7;">
+        • <b>HTTPS</b> terminado no Railway<br />
+        • <b>CORS</b> restrito às origens da app e do site<br />
+        • Uploads com limite de tamanho e validação
+      </p>
+    </div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Segurança</span><span>11 / 14</span></div>
+</section>
+
+<!-- ================= 12. QUALIDADE ================= -->
+<section class="slide">
+  <p class="kicker">Qualidade</p>
+  <h1>Verificado, não apenas<br />“parece funcionar”.</h1>
+
+  <div class="grid g2" style="margin-top:0.15in;">
+    <div class="card" style="display:flex; align-items:center; gap:18px;">
+      <div class="big-stat">130</div>
+      <div>
+        <h3 style="margin-bottom:2px;">testes de API</h3>
+        <p>Verificações automáticas de login, serviços, propostas, projetos, mensagens e pagamentos.</p>
+      </div>
+    </div>
+    <div class="card" style="display:flex; align-items:center; gap:18px;">
+      <div class="big-stat">12</div>
+      <div>
+        <h3 style="margin-bottom:2px;">serviços em produção</h3>
+        <p>Confirmados pela API pública, além de 9 freelancers e 12 categorias.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g3" style="margin-top:0.25in;">
+    <div class="card"><h3>Build</h3><p>Frontend compila em ~1 min; erros de importação aparecem antes do deploy.</p></div>
+    <div class="card"><h3>Health</h3><p><b>/api/health</b> mostra estado da BD, revisão do deploy e estado do seed.</p></div>
+    <div class="card"><h3>Telemóvel</h3><p>Testado com dados móveis, incluindo login e carregamento da página inicial.</p></div>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Qualidade</span><span>12 / 14</span></div>
+</section>
+
+<!-- ================= 13. LIMITAÇÕES ================= -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Próximos passos</p>
+  <h1>Honestidade sobre o que<br />ainda falta.</h1>
+
+  <div class="grid g2" style="margin-top:0.15in;">
+    <div class="card" style="border-top:5px solid #fbbf24;">
+      <h3>Limitações atuais</h3>
+      <p style="line-height:1.8;">
+        • Uploads efémeros (disco do Railway reinicia)<br />
+        • APK de debug, ainda sem assinatura Play Store<br />
+        • Pagamentos em modo de teste (simulados)<br />
+        • Sem notificações push<br />
+        • Contas demo com senha pública
+      </p>
+    </div>
+    <div class="card" style="border-top:5px solid #10b981;">
+      <h3>Próximos passos</h3>
+      <p style="line-height:1.8;">
+        • Volume ou Cloudinary para imagens<br />
+        • M-Pesa/e-Mola reais em sandbox<br />
+        • Assinar AAB e publicar na Play Store<br />
+        • Notificações push (FCM)<br />
+        • Testes end-to-end completos
+      </p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:0.3in;">
+    <b>Regra para lançar a sério:</b> remover ou mudar a senha das contas demo, desligar o
+    <b>SEED_DEMO</b> e configurar um Volume antes de divulgar a app.
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Limitações</span><span>13 / 14</span></div>
+</section>
+
+<!-- ================= 14. ENCERRAMENTO ================= -->
+<section class="slide dark" style="justify-content: center;">
+  <div style="display:flex; align-items:center; gap:0.3in; margin-bottom:0.3in;">
+    <div class="logo-badge">✨</div>
+    <div style="font-size:13px; letter-spacing:3px; text-transform:uppercase; color:#93c5fd; font-weight:800;">FreelaMZ</div>
+  </div>
+
+  <h1 style="font-size:58px; max-width:10in; line-height:1.1;">
+    Talento moçambicano,<br />num só lugar.
+  </h1>
+
+  <p class="lead" style="font-size:20px; margin-top:0.15in; max-width:9in;">
+    O FreelaMZ está online, com base de dados, API publicada e app Android instalável.
+    O próximo passo é transformar o protótipo num produto usado todos os dias.
+  </p>
+
+  <div style="margin-top:0.55in; display:flex; gap:0.5in; align-items:flex-end;">
+    <div>
+      <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#93c5fd; font-weight:800; margin-bottom:6px;">Autor</div>
+      <div style="font-size:19px; font-weight:800; color:#fff;">Clávio Alfredo Chitsulete</div>
+      <div style="font-size:14px; color:#cbd5e1; margin-top:3px;">claviochitsulete@gmail.com</div>
+    </div>
+    <div>
+      <div style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#93c5fd; font-weight:800; margin-bottom:6px;">Projeto</div>
+      <div style="font-size:14px; color:#e2e8f0;">github.com/ClavioBahama/freelamz</div>
+      <div style="font-size:14px; color:#e2e8f0; margin-top:3px;">Maputo · 2026</div>
+    </div>
+  </div>
+
+  <div style="margin-top:0.5in; font-size:34px; font-weight:900; letter-spacing:-1px; color:#fff;">Obrigado.</div>
+
+  <div class="footer"><span>FreelaMZ · Apresentação</span><span>14 / 14</span></div>
+</section>
+
+<!-- ================= ROTEIRO 1 ================= -->
+<section class="slide rot">
+  <div class="rot-head">
+    <h2>Roteiro de fala</h2>
+    <span>Slides 1–4 · ~2 min 30 s</span>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 1 — Capa <span class="t">(~30 s)</span></h4>
+    <p>“Boa tarde. Chamo-me Clávio Alfredo Chitsulete e vou apresentar o FreelaMZ, uma plataforma
+    que liga clientes a freelancers em Moçambique. A ideia nasceu de um problema concreto e hoje
+    está online: a API está publicada, a base de dados tem dados reais e existe uma app Android
+    instalável.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 2 — O problema <span class="t">(~45 s)</span></h4>
+    <p>“Em Moçambique há muito talento: programadores, designers, redatores, fotógrafos,
+    contabilistas. O problema não é falta de profissionais — é falta de um lugar onde se
+    encontrem. Hoje a contratação acontece por indicação ou em grupos de WhatsApp. Isso traz três
+    consequências: a procura é dispersa, não há reputação para comparar e o acordo fica informal,
+    sem registo de preço, prazo ou entrega.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 3 — A solução <span class="t">(~40 s)</span></h4>
+    <p>“O FreelaMZ resolve isso juntando tudo num só lugar. O freelancer publica serviços com
+    preço e prazo; o cliente envia propostas; o projeto avança por estados; há mensagens dentro da
+    plataforma, carteira com escrow e, no fim, avaliações. Do primeiro contacto ao pagamento, tudo
+    fica registado.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 4 — Para quem <span class="t">(~30 s)</span></h4>
+    <p>“A plataforma serve três tipos de utilizador. O cliente procura, compara e contrata. O
+    freelancer tem uma vitrine e constrói reputação. E o administrador gere utilizadores,
+    serviços e disputas. Os três usam o mesmo fluxo.”</p>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Roteiro</span><span>Roteiro 1 / 4</span></div>
+</section>
+
+<!-- ================= ROTEIRO 2 ================= -->
+<section class="slide rot">
+  <div class="rot-head">
+    <h2>Roteiro de fala</h2>
+    <span>Slides 5–8 · ~2 min 40 s</span>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 5 — Como funciona <span class="t">(~45 s)</span></h4>
+    <p>“O fluxo replica o trabalho real. Primeiro o freelancer publica o serviço. O cliente envia
+    uma proposta com o valor que pretende pagar. O freelancer aceita e o projeto é criado. Depois
+    da entrega e da aprovação, o pagamento é libertado e fica a avaliação. A regra de ouro é
+    simples: nada avança por fora da plataforma, para que cada passo deixe registo.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 6 — Arquitetura <span class="t">(~40 s)</span></h4>
+    <p>“Tecnicamente, a interface é React com Framework7 e é empacotada com Capacitor para
+    Android. Fala com uma API REST em Node.js e Express, autenticada com JWT e bcrypt, que guarda
+    tudo num MySQL gerido no Railway. Uma API serve a app, o site e os testes.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 7 — Publicação <span class="t">(~40 s)</span></h4>
+    <p>“A publicação é feita no Railway. O serviço usa a pasta <b>backend</b>, o builder RAILPACK e
+    o comando <b>npm start</b>. O healthcheck é <b>/api/health</b>, por isso o Railway sabe sempre
+    se a app está viva. As credenciais ficam em variáveis de ambiente — nunca no código. O
+    endereço público é este.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 8 — APK <span class="t">(~35 s)</span></h4>
+    <p>“Para o Android não é preciso Android Studio. O GitHub Actions compila o frontend, o
+    Capacitor sincroniza e o Gradle gera o APK. Em cerca de quatro minutos temos um artefacto
+    pronto a instalar. Já foi gerado três vezes, incluindo a versão com a página Sobre.”</p>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Roteiro</span><span>Roteiro 2 / 4</span></div>
+</section>
+
+<!-- ================= ROTEIRO 3 ================= -->
+<section class="slide rot">
+  <div class="rot-head">
+    <h2>Roteiro de fala</h2>
+    <span>Slides 9–11 · ~2 min</span>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 9 — Dados <span class="t">(~35 s)</span></h4>
+    <p>“Para a app não aparecer vazia, criei um seed de demonstração: oito freelancers, dois
+    clientes e doze serviços, todos com perfil, habilidades e carteira. É idempotente — pode
+    correr várias vezes que não duplica. No Railway corre sozinho no arranque com
+    <b>SEED_DEMO=true</b>, usando a ligação interna, sem precisar de copiar URL nem senha.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 10 — Problemas e soluções <span class="t">(~50 s)</span></h4>
+    <p>“Nem tudo correu à primeira. O deploy entrava em ciclo quando a base de dados ainda estava
+    a acordar; resolvi com retentativas e um health que responde sempre. A app aparecia vazia;
+    resolvi com dados de demonstração. Os dados não chegavam ao Railway porque a URL estava vazia
+    na janela local; passei o seed para o servidor. O login ficava cortado no telemóvel; corrigi
+    com CSS para notch e campos de 16 pixels. E a página inicial exigia login sem motivo; tornei
+    os perfis públicos e o 401 passou a ser condicional.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 11 — Segurança <span class="t">(~40 s)</span></h4>
+    <p>“As senhas são guardadas com bcrypt e as sessões usam JWT. Os perfis públicos de
+    freelancers não expõem email nem métodos de recebimento. Os segredos vivem apenas em
+    variáveis de ambiente. A comunicação é por HTTPS e o CORS está limitado às origens da app e do
+    site.”</p>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Roteiro</span><span>Roteiro 3 / 4</span></div>
+</section>
+
+<!-- ================= ROTEIRO 4 ================= -->
+<section class="slide rot">
+  <div class="rot-head">
+    <h2>Roteiro de fala</h2>
+    <span>Slides 12–14 · ~1 min 40 s</span>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 12 — Qualidade <span class="t">(~30 s)</span></h4>
+    <p>“Não me limitei a ver se ‘parecia funcionar’. Há 130 verificações automáticas na API, o
+    build do frontend é validado antes de cada deploy e o health mostra a revisão e o estado do
+    seed. Testei também no telemóvel, com dados móveis.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 13 — Limitações <span class="t">(~40 s)</span></h4>
+    <p>“Sei o que ainda falta. O disco do Railway é efémero, por isso as imagens precisam de um
+    Volume ou de um serviço como o Cloudinary. O APK é de debug, ainda sem assinatura para a Play
+    Store. Os pagamentos são simulados e não há notificações push. Antes de lançar a sério, é
+    preciso mudar a senha das contas demo e desligar o SEED_DEMO.”</p>
+  </div>
+
+  <div class="rot-block">
+    <h4>Slide 14 — Encerramento <span class="t">(~25 s)</span></h4>
+    <p>“Resumindo: o FreelaMZ está online, com base de dados, API publicada e app Android
+    instalável. O próximo passo é transformar este protótipo num produto usado todos os dias.
+    Obrigado pela atenção — fico disponível para perguntas.”</p>
+  </div>
+
+  <div class="note" style="margin-top:0.25in;">
+    <b>Dicas de apresentação:</b> 10 minutos no total. Se o tempo for curto, cortar os slides 4 e
+    12. Se alguém perguntar “quem fez?”, responder: <i>“Concebido, desenhado e programado por
+    Clávio Alfredo Chitsulete — está também na página Sobre dentro da app.”</i>
+  </div>
+
+  <div class="footer"><span>FreelaMZ · Roteiro</span><span>Roteiro 4 / 4</span></div>
+</section>
+
+<script>
+  /* Apenas para pré-visualização/QA: ?slide=N mostra uma página isolada.
+     Sem parâmetro (impressão/PDF) mostra todas. */
+  (function () {
+    var p = new URLSearchParams(location.search).get('slide');
+    if (!p) return;
+    var n = parseInt(p, 10);
+    document.querySelectorAll('.slide').forEach(function (s, i) {
+      if (i !== n - 1) s.style.display = 'none';
+    });
+  })();
+</script>
+
+</body>
+</html>
