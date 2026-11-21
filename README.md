@@ -9,6 +9,8 @@ Marketplace de freelancers focado em Moçambique. Encontre talentos. Encontre op
 - [Relatório académico (PDF A4)](docs/FreelaMZ-Relatorio.pdf) — documento formal para entrega ao docente (fonte: [docs/relatorio-academico.html](docs/relatorio-academico.html))
 - [Apresentação em PDF](docs/FreelaMZ-Apresentacao.pdf) — 14 slides + roteiro de fala (fonte: [docs/apresentacao.html](docs/apresentacao.html))
 - [Migração Railway → Render + TiDB](docs/migracao-render-tidb.md) — guia operacional da hospedagem gratuita actual
+- **NOVO** [Apresentação da migração (PDF, 15 slides + roteiro)](docs/Apresentacao-Migracao.pdf) — fonte: [docs/apresentacao-migracao.html](docs/apresentacao-migracao.html)
+- **NOVO** [Relatório de migração (PDF A4, 16 páginas)](docs/Relatorio-Migracao.pdf) — fonte: [docs/relatorio-migracao.html](docs/relatorio-migracao.html)
 
 ---
 

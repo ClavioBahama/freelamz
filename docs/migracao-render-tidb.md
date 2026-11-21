@@ -225,6 +225,19 @@ Checklist:
 
 ---
 
+## 7.1 Documentação de entrega (gerada a 21/11/2026)
+
+Dois documentos novos, feitos de zero a partir do trabalho realizado nesta migração:
+
+- [Apresentação da migração — 15 slides + roteiro de fala](Apresentacao-Migracao.pdf)  
+  Fonte editável: [apresentacao-migracao.html](apresentacao-migracao.html)
+- [Relatório de migração — A4, 16 páginas](Relatorio-Migracao.pdf)  
+  Fonte editável: [relatorio-migracao.html](relatorio-migracao.html)
+
+Ambos foram gerados em PDF com o mesmo motor de impressão usado nos documentos anteriores e estão também linkados no `README.md`.
+
+---
+
 ## 8. Segurança e rollout
 
 - Nenhuma senha, `JWT_SECRET`, `MYSQL_URL` com senha ou token foi ou deve ser colado no chat.
@@ -233,6 +246,8 @@ Checklist:
 - A Render pode suspender os serviços gratuitos se esgotar horas/banda; nesse caso, sem método de pagamento, suspende até ao mês seguinte.
 - **Manter o Railway intacto até a validação terminar.** Só depois de tudo verde é que o projecto antigo deve ser desligado.
 - Se algo falhar, o rollback imediato é voltar a apontar `VITE_API_URL` para a URL antiga — mas essa URL está actualmente pausada, por isso o rollback real depende de reactivar o Railway.
+
+**Estado em 21/11/2026:** os itens "revisão do deploy" e "ficheiro temporário do Office" já estão concluídos. O desligamento do Railway ficou pendente apenas porque não existe sessão autenticada do Railway neste ambiente (sem CLI ligado, sem token e sem browser disponível); deve ser feito pelo próprio utilizador no painel do Railway, sem partilhar credenciais.
 
 ---
 

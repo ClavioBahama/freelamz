@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<title>FreelaMZ — Migração para Hospedagem Gratuita</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Segoe UI Variable", system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 13.333in; height: 7.5in;
+    padding: 0.55in 0.7in;
+    page-break-after: always;
+    position: relative; overflow: hidden;
+    background: #f5f7fb;
+    display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  .blob { position: absolute; border-radius: 50%; pointer-events: none; }
+  .blob-a { width: 5.2in; height: 5.2in; right: -1.9in; top: -2.2in;
+    background: radial-gradient(circle, rgba(37,99,235,0.16), transparent 68%); }
+  .blob-b { width: 4in; height: 4in; left: -1.7in; bottom: -2in;
+    background: radial-gradient(circle, rgba(255,122,24,0.12), transparent 68%); }
+
+  .dark { background: #0b1b3f; color: #ffffff; }
+  .dark::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 88% 12%, rgba(37,99,235,0.55), transparent 55%),
+      radial-gradient(circle at 10% 92%, rgba(255,122,24,0.30), transparent 55%);
+  }
+  .dark > * { position: relative; }
+
+  .logo-badge {
+    width: 0.92in; height: 0.92in; border-radius: 0.28in;
+    background: linear-gradient(135deg, #2563eb, #12295e);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.46in;
+    box-shadow: 0 18px 40px rgba(37,99,235,0.35);
+  }
+  .kicker {
+    font-size: 13px; font-weight: 800; letter-spacing: 2.4px;
+    text-transform: uppercase; color: #2563eb; margin: 0 0 10px 0;
+  }
+  .dark .kicker { color: #93c5fd; }
+
+  h1 { font-size: 44px; line-height: 1.08; letter-spacing: -1.2px;
+    margin: 0 0 14px 0; color: #0b1b3f; font-weight: 900; }
+  .dark h1 { color: #ffffff; }
+  h2 { font-size: 25px; line-height: 1.2; letter-spacing: -0.4px;
+    margin: 0 0 10px 0; color: #0b1b3f; font-weight: 800; }
+  p { margin: 0; }
+  .lead { font-size: 19px; line-height: 1.55; color: #475569; }
+  .dark .lead { color: #cbd5e1; }
+
+  .footer {
+    position: absolute; left: 0.7in; right: 0.7in; bottom: 0.3in;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: #94a3b8; letter-spacing: 0.3px;
+  }
+  .dark .footer { color: rgba(255,255,255,0.55); }
+  .footer b { color: #64748b; font-weight: 700; }
+  .dark .footer b { color: rgba(255,255,255,0.8); }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px;
+    padding: 20px 20px 18px 20px;
+    box-shadow: 0 10px 26px rgba(15,23,42,0.05);
+  }
+  .card h3 { margin: 0 0 6px 0; font-size: 18px; font-weight: 800;
+    color: #0b1b3f; letter-spacing: -0.2px; }
+  .card p { font-size: 14.5px; line-height: 1.5; color: #64748b; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #eef4ff; color: #1d4ed8;
+    border-radius: 999px; padding: 8px 14px;
+    font-size: 14px; font-weight: 700;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .num {
+    width: 34px; height: 34px; border-radius: 11px;
+    background: linear-gradient(135deg, #2563eb, #12295e);
+    color: #fff; font-weight: 900; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .big-stat { font-size: 52px; font-weight: 900; color: #2563eb;
+    line-height: 1; letter-spacing: -2px; }
+  .stat-label { font-size: 13.5px; color: #64748b; margin-top: 6px; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; font-size: 11px; letter-spacing: 1.1px;
+    text-transform: uppercase; color: #94a3b8;
+    padding: 0 10px 8px 10px; border-bottom: 1px solid #e2e8f0;
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid #eef2f7;
+    color: #334155; vertical-align: top; line-height: 1.35; }
+  td:first-child { font-weight: 700; color: #0b1b3f; }
+  tr:last-child td { border-bottom: none; }
+
+  .flow { display: flex; align-items: center; gap: 12px; }
+  .box {
+    flex: 1; background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 16px; padding: 16px; text-align: center;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+  }
+  .box .ico { font-size: 26px; margin-bottom: 6px; }
+  .box b { display: block; font-size: 15px; color: #0b1b3f; margin-bottom: 3px; }
+  .box span { font-size: 12.5px; color: #64748b; }
+  .arrow { font-size: 26px; color: #94a3b8; font-weight: 300; }
+
+  .steps { display: flex; gap: 12px; }
+  .step {
+    flex: 1; background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 16px; padding: 16px 14px;
+  }
+  .step .n {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #2563eb; color: #fff; font-weight: 900; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+  .step b { display: block; font-size: 14.5px; color: #0b1b3f; margin-bottom: 4px; }
+  .step span { font-size: 12.5px; color: #64748b; line-height: 1.4; display: block; }
+
+  .code {
+    background: #0b1b3f; color: #dbeafe; border-radius: 12px;
+    padding: 14px 16px; font-family: Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 1.6; overflow: hidden;
+  }
+  .code .c { color: #94a3b8; }
+  .code .k { color: #7dd3fc; }
+
+  .rot { background: #ffffff; }
+  .rot-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 14px;
+  }
+  .rot-head h2 { font-size: 22px; margin: 0; }
+  .rot-head span { font-size: 12px; color: #94a3b8; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; }
+  .rot-block { margin-bottom: 11px; }
+  .rot-block h4 { margin: 0 0 3px 0; font-size: 13.5px; color: #1d4ed8;
+    font-weight: 800; }
+  .rot-block p { font-size: 12.5px; line-height: 1.5; color: #334155; }
+  .rot-block .t { color: #94a3b8; font-weight: 600; font-size: 11.5px; }
+  .note {
+    background: #f1f5f9; border-left: 4px solid #2563eb; border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; color: #475569; line-height: 1.5;
+  }
+  .ok { color: #047857; font-weight: 800; }
+  .bad { color: #b91c1c; font-weight: 800; }
+  .warn { color: #b45309; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide dark" style="justify-content:center;">
+  <div style="display:flex; align-items:center; gap:0.45in; margin-bottom:0.5in;">
+    <div class="logo-badge">⚡</div>
+    <div>
+      <div style="font-size:13px; letter-spacing:3px; text-transform:uppercase; color:#93c5fd; font-weight:800;">Estudo de caso</div>
+      <div style="font-size:15px; color:#cbd5e1; margin-top:4px;">Infraestrutura · custo zero · publicação contínua</div>
+    </div>
+  </div>
+  <h1 style="font-size:74px; letter-spacing:-3px; margin-bottom:12px;">FreelaMZ<br />sem Railway</h1>
+  <p class="lead" style="font-size:23px; max-width:9.4in;">
+    Como tirar o projeto dos créditos esgotados e colocá-lo noutro serviço gratuito — com MySQL, deploy automático e nenhum segredo partilhado.
+  </p>
+  <div style="margin-top:0.55in; display:flex; gap:12px; flex-wrap:wrap;">
+    <span class="chip" style="background:rgba(255,255,255,0.12);color:#fff;">Render</span>
+    <span class="chip" style="background:rgba(255,255,255,0.12);color:#fff;">TiDB Cloud Starter</span>
+    <span class="chip" style="background:rgba(255,255,255,0.12);color:#fff;">GitHub Actions</span>
+  </div>
+  <div style="margin-top:0.6in; font-size:15px; color:#e2e8f0;">
+    <b style="color:#fff;">Clávio Alfredo Chitsulete</b> · Maputo, Moçambique · 21 de novembro de 2026
+  </div>
+  <div class="footer"><span>FreelaMZ · Migração</span><span>1 / 15</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Ponto de partida</p>
+  <h1>O Railway deixou de ser uma opção</h1>
+  <p class="lead" style="max-width:10in; margin-bottom:0.3in;">
+    O projeto esteve online em <b>freelamz-production-7103b885.up.railway.app</b>, com healthcheck verde e dados de demonstração. Até que os créditos acabaram.
+  </p>
+  <div class="grid g3" style="margin-top:0.2in;">
+    <div class="card"><div class="num">1</div><h3>Créditos esgotados</h3><p>O saldo da conta chegou a zero durante o uso normal do plano.</p></div>
+    <div class="card"><div class="num">2</div><h3>Serviços pausados</h3><p>Backend e MySQL com estado <span class="bad">Paused from exceeding limits</span>.</p></div>
+    <div class="card"><div class="num">3</div><h3>Retorno em 20 dias</h3><p>Esperar pelo ciclo de créditos não era aceitável para uma entrega académica.</p></div>
+  </div>
+  <div class="note" style="margin-top:0.25in;">
+    Mensagem-chave: o problema não foi o código — foi a dependência de um único fornecedor com orçamento limitado.
+  </div>
+  <div class="footer"><span>FreelaMZ · Ponto de partida</span><span>2 / 15</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="blob blob-b"></div>
+  <p class="kicker">Critérios</p>
+  <h1>O que a nova casa tinha de garantir</h1>
+  <div class="grid g2" style="gap:14px; margin-top:0.1in;">
+    <div class="card"><h3>① Grátis de verdade</h3><p>Sem cartão internacional e sem plano que “expira” ao fim de 30 dias.</p></div>
+    <div class="card"><h3>② MySQL preservado</h3><p>O código usa <b>mysql2</b>, JSON, ENUM e chaves estrangeiras — trocar de SGBD seria caro.</p></div>
+    <div class="card"><h3>③ Deploy automático</h3><p>Ligar ao GitHub e publicar a cada push, sem copiar ficheiros à mão.</p></div>
+    <div class="card"><h3>④ Segredos fora do chat</h3><p>Senhas e tokens introduzidos apenas nos painéis; nunca no repositório nem na conversa.</p></div>
+    <div class="card"><h3>⑤ Previsibilidade</h3><p>Saber o que acontece quando a quota gratuita acaba: suspensão, estrangulamento ou cobrança.</p></div>
+    <div class="card"><h3>⑥ Baixa manutenção</h3><p>Sem servidor para gerir, sem TLS manual, sem scripts de arranque frágeis.</p></div>
+  </div>
+  <div class="footer"><span>FreelaMZ · Critérios</span><span>3 / 15</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <p class="kicker">Pesquisa</p>
+  <h1>Alternativas verificadas em documentação oficial</h1>
+  <table style="margin-top:0.12in;">
+    <thead><tr><th>Serviço</th><th>Grátis</th><th>Cartão</th><th>MySQL</th><th>Motivo da decisão</th></tr></thead>
+    <tbody>
+      <tr><td>Render</td><td>Sim · 0,1 CPU / 512 MB</td><td>Não para começar</td><td>Não</td><td><b>Escolhido</b> para o backend</td></tr>
+      <tr><td>TiDB Starter</td><td>Sim · 5 GiB + 50 M RU</td><td>Só a partir da 6.ª instância</td><td>Compatível</td><td><b>Escolhido</b> para a base</td></tr>
+      <tr><td>alwaysdata Free</td><td>Sim · 0 € para sempre</td><td>Não</td><td>Sim (MariaDB)</td><td>Bom plano B; deploy mais manual</td></tr>
+      <tr><td>Koyeb</td><td>Não tem web service grátis</td><td>—</td><td>Postgres</td><td>Descartado (Pro $29/mês)</td></tr>
+      <tr><td>PlanetScale</td><td>Sem plano gratuito visível</td><td>—</td><td>Sim</td><td>Descartado</td></tr>
+      <tr><td>Glitch / Aiven / Cyclic</td><td>Encerrado / sem MySQL / não confirmado</td><td>—</td><td>—</td><td>Descartados</td></tr>
+    </tbody>
+  </table>
+  <div class="footer"><span>FreelaMZ · Alternativas</span><span>4 / 15</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Decisão</p>
+  <h1>Render + TiDB Cloud Starter</h1>
+  <p class="lead" style="max-width:10.2in; margin-bottom:0.28in;">
+    Une o deploy nativo por GitHub da Render com uma base MySQL-compatível que tem quota mensal clara e não cobra nada quando a esgota.
+  </p>
+  <div class="grid g2" style="gap:14px;">
+    <div class="card"><h3>Porquê a Render</h3><p>Web Service Node.js gratuito, healthcheck próprio, variáveis no painel e <b>redeploy automático</b> por push.</p></div>
+    <div class="card"><h3>Porquê o TiDB</h3><p>Aceita o driver <b>mysql2</b> e o SQL do projeto; 5 GiB + 50 M RU por instância; sem cartão na primeira instância.</p></div>
+  </div>
+  <div class="note" style="margin-top:0.22in;">
+    <b>Compromisso assumido:</b> a Render dorme após 15 minutos sem pedidos e o primeiro clique demora cerca de 1 minuto. Para a apresentação, basta abrir o link com antecipação.
+  </div>
+  <div class="footer"><span>FreelaMZ · Decisão</span><span>5 / 15</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <p class="kicker">Arquitetura final</p>
+  <h1>Três serviços, uma cadeia simples</h1>
+  <div class="flow" style="margin-top:0.25in;">
+    <div class="box"><div class="ico">🐙</div><b>GitHub</b><span>repo freelamz · push em main</span></div>
+    <div class="arrow">→</div>
+    <div class="box"><div class="ico">🟢</div><b>Render</b><span>backend Node.js · /api</span></div>
+    <div class="arrow">→</div>
+    <div class="box"><div class="ico">🗄</div><b>TiDB Cloud</b><span>MySQL-compatível · TLS · porta 4000</span></div>
+  </div>
+  <div class="flow" style="margin-top:0.22in;">
+    <div class="box"><div class="ico">⚙️</div><b>GitHub Actions</b><span>variável VITE_API_URL</span></div>
+    <div class="arrow">→</div>
+    <div class="box"><div class="ico">📱</div><b>APK de debug</b><span>Capacitor aponta para a Render</span></div>
+    <div class="arrow">→</div>
+    <div class="box"><div class="ico">👤</div><b>Utilizador</b><span>web, telemóvel ou docente</span></div>
+  </div>
+  <div class="note" style="margin-top:0.2in;">
+    Não foi preciso alterar o código do backend: ele já lia MYSQL_URL, PORT, DB_SSL e CORS_ORIGINS.
+  </div>
+  <div class="footer"><span>FreelaMZ · Arquitetura</span><span>6 / 15</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <p class="kicker">Base de dados</p>
+  <h1>Sem SQL Editor? Usamos mysql2</h1>
+  <p class="lead" style="max-width:10in; margin-bottom:0.2in;">
+    A interface do TiDB Starter não mostrava o editor de SQL. Criámos um script que liga com TLS e cria a base.
+  </p>
+  <div class="code" style="margin-top:0.1in;">
+    <span class="c">// backend/scripts/criar-base-tidb.js</span><br />
+    mysql.<span class="k">createConnection</span>({ host, port: <b>4000</b>, user, password,<br />
+    &nbsp;&nbsp;database: <span class="k">'freelamz'</span>, <b>ssl: {}</b> });<br />
+    <span class="k">CREATE DATABASE</span> IF NOT EXISTS freelamz<br />
+    &nbsp;&nbsp;CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;<br />
+    <span class="k">SHOW DATABASES</span>; <span class="c">// freelamz confirmado na lista</span>
+  </div>
+  <div class="note" style="margin-top:0.2in;">
+    A senha ficou só no backend/.env e nunca foi impressa. As mensagens de erro filtram a senha, substituindo-a por ***.
+  </div>
+  <div class="footer"><span>FreelaMZ · Base de dados</span><span>7 / 15</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <p class="kicker">Incidentes</p>
+  <h1>Dois erros reais, duas correcções</h1>
+  <div class="grid g2" style="gap:14px; margin-top:0.1in;">
+    <div class="card">
+      <h3><span class="bad">1.</span> Missing user name prefix</h3>
+      <p>O marcador <code>&lt;UTILIZADOR_TIDB&gt;</code> do ficheiro de exemplo ficou literal na MYSQL_URL.</p>
+      <p style="margin-top:8px;"><span class="ok">Correcção:</span> preencher com <b>4RvyEVJJGCtaatr.root</b> no painel da Render.</p>
+    </div>
+    <div class="card">
+      <h3><span class="bad">2.</span> ER_NO_SUCH_TABLE</h3>
+      <p>O seed automático precisava da tabela <code>categories</code>, mas a base estava vazia.</p>
+      <p style="margin-top:8px;"><span class="ok">Correcção:</span> aplicar schema.sql + seed.sql + migrate.js por script.</p>
+    </div>
+  </div>
+  <div class="note" style="margin-top:0.22in;">
+    Lição: o diagnóstico não estava no código — estava na configuração e na ordem das operações. O endpoint /api/health/db mostrou o utilizador errado sem revelar a senha.
+  </div>
+  <div class="footer"><span>FreelaMZ · Incidentes</span><span>8 / 15</span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <p class="kicker">Estrutura</p>
+  <h1>Da base vazia ao catálogo completo</h1>
+  <div class="steps" style="margin-top:0.2in;">
+    <div class="step"><div class="n">1</div><b>schema.sql</b><span>Cria as tabelas com chaves estrangeiras e utf8mb4.</span></div>
+    <div class="step"><div class="n">2</div><b>seed.sql</b><span>Categorias e habilidades iniciais.</span></div>
+    <div class="step"><div class="n">3</div><b>migrate.js</b><span>Carteiras, escrow, entregas e colunas da FASE A.</span></div>
+    <div class="step"><div class="n">4</div><b>SEED_DEMO</b><span>Freelancers e serviços, com retry de 60 s no servidor.</span></div>
+  </div>
+  <div class="grid g3" style="margin-top:0.28in;">
+    <div class="card" style="text-align:center;"><div class="big-stat">15</div><div class="stat-label">tabelas criadas</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">categorias</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">serviços demo</div></div>
+  </div>
+  <div class="footer"><span>FreelaMZ · Estrutura</span><span>9 / 15</span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <p class="kicker">Configuração</p>
+  <h1>Seis variáveis, todas no painel</h1>
+  <table style="margin-top:0.12in;">
+    <thead><tr><th>Variável</th><th>Para que serve</th></tr></thead>
+    <tbody>
+      <tr><td>MYSQL_URL</td><td>String única de ligação ao TiDB, com utilizador, senha, host, porta 4000 e base.</td></tr>
+      <tr><td>DB_SSL</td><td><b>true</b> — obriga à ligação encriptada.</td></tr>
+      <tr><td>JWT_SECRET</td><td>Assina os tokens de login; gerado localmente com crypto.</td></tr>
+      <tr><td>NODE_ENV</td><td><b>production</b>.</td></tr>
+      <tr><td>CORS_ORIGINS</td><td>Origens permitidas, incluindo capacitor://localhost para o APK.</td></tr>
+      <tr><td>SEED_DEMO</td><td><b>true</b> — povoa a base nova no arranque.</td></tr>
+    </tbody>
+  </table>
+  <div class="note" style="margin-top:0.18in;">
+    Usámos o botão “Add from .env” da Render com um ficheiro limpo. O .env local, com credenciais de desenvolvimento, nunca foi carregado.
+  </div>
+  <div class="footer"><span>FreelaMZ · Configuração</span><span>10 / 15</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="blob blob-b"></div>
+  <p class="kicker">Frontend e APK</p>
+  <h1>Uma variável no GitHub resolve o APK</h1>
+  <div class="code" style="margin-top:0.15in;">
+    <span class="c"># GitHub → Settings → Variables</span><br />
+    VITE_API_URL = <span class="k">https://freelamz.onrender.com/api</span><br /><br />
+    <span class="c"># dispara a compilação</span><br />
+    gh workflow run build-apk.yml
+  </div>
+  <div class="grid g3" style="margin-top:0.24in;">
+    <div class="card"><h3>Sem editar código</h3><p>O workflow e o capacitor.config.js já liam VITE_API_URL.</p></div>
+    <div class="card"><h3>Dev intacto</h3><p>.env.development continua com /api e o proxy do Vite para localhost:3000.</p></div>
+    <div class="card"><h3>Segurança</h3><p>Nenhum token foi colado no chat; o gh já estava autenticado.</p></div>
+  </div>
+  <div class="footer"><span>FreelaMZ · APK</span><span>11 / 15</span></div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <p class="kicker">Resultados</p>
+  <h1>Evidências de que está tudo a funcionar</h1>
+  <div class="grid g4" style="margin-top:0.2in;">
+    <div class="card" style="text-align:center;"><div class="big-stat">200</div><div class="stat-label">/api/health · db up</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">categorias</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">12</div><div class="stat-label">serviços</div></div>
+    <div class="card" style="text-align:center;"><div class="big-stat">7,1 MB</div><div class="stat-label">APK de debug</div></div>
+  </div>
+  <div class="code" style="margin-top:0.24in;">
+    { "success": true, "db": "up", "seed_demo": { "pedido": true, "feito": true } }<br />
+    POST /api/auth/login → <b>200 FREELANCER</b> · isabel@demo.freelamz.mz
+  </div>
+  <div class="footer"><span>FreelaMZ · Resultados</span><span>12 / 15</span></div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <p class="kicker">Limites</p>
+  <h1>O que o plano gratuito não dá</h1>
+  <div class="grid g2" style="gap:14px; margin-top:0.12in;">
+    <div class="card"><h3><span class="warn">Cold start</span></h3><p>15 min sem tráfego → serviço adormece; o próximo pedido demora cerca de 1 minuto.</p></div>
+    <div class="card"><h3><span class="warn">Horas e banda</span></h3><p>750 horas/mês por workspace; se esgotar, a Render suspende os serviços gratuitos.</p></div>
+    <div class="card"><h3><span class="warn">Quota do TiDB</span></h3><p>Ao esgotar 50 M RU, a instância é estrangulada até ao mês seguinte — sem cobrança.</p></div>
+    <div class="card"><h3><span class="warn">Disco efémero</span></h3><p>Imagens enviadas para uploads/ desaparecem no próximo deploy; é preciso armazenamento externo.</p></div>
+  </div>
+  <div class="note" style="margin-top:0.2in;">
+    A documentação da Render desaconselha o plano gratuito para produção. Para uma demonstração académica é adequado — para um produto real, é preciso migrar para um plano pago.
+  </div>
+  <div class="footer"><span>FreelaMZ · Limites</span><span>13 / 15</span></div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="blob blob-a"></div>
+  <p class="kicker">Encerramento</p>
+  <h1>Lições e próximos passos</h1>
+  <div class="grid g2" style="gap:14px; margin-top:0.12in;">
+    <div class="card">
+      <h3>O que aprendemos</h3>
+      <p>• Código preparado para variáveis de ambiente migra sem alterações.<br />
+      • Healthchecks com diagnóstico poupam horas de procura.<br />
+      • Documentação oficial vale mais que suposições.<br />
+      • Segredos nunca devem passar pelo chat.</p>
+    </div>
+    <div class="card">
+      <h3>O que vem a seguir</h3>
+      <p>• Desligar o projeto antigo no Railway.<br />
+      • Assinar o APK para publicação na Play Store.<br />
+      • Mover os uploads para armazenamento externo.<br />
+      • Monitorizar o uso do TiDB e da Render.</p>
+    </div>
+  </div>
+  <div class="chips" style="margin-top:0.28in;">
+    <span class="chip">✅ API online</span><span class="chip">✅ Base povoada</span><span class="chip">✅ APK gerado</span><span class="chip">✅ Documentado</span>
+  </div>
+  <div class="footer"><span>FreelaMZ · Encerramento</span><span>14 / 15</span></div>
+</section>
+
+<!-- 15 -->
+<section class="slide rot">
+  <div class="rot-head"><h2>Roteiro de fala</h2><span>≈ 12 minutos</span></div>
+  <div class="grid g2" style="gap:0 26px;">
+    <div>
+      <div class="rot-block"><h4>1–2 · Capa e problema <span class="t">1,5 min</span></h4><p>Apresentar o projeto e explicar que o Railway parou por créditos. Reforçar que o código não estava em causa.</p></div>
+      <div class="rot-block"><h4>3–4 · Critérios e pesquisa <span class="t">2 min</span></h4><p>Mostrar os seis requisitos e a tabela de alternativas. Mencionar que os números vieram de documentação oficial.</p></div>
+      <div class="rot-block"><h4>5–6 · Decisão e arquitetura <span class="t">1,5 min</span></h4><p>Justificar Render + TiDB e percorrer o diagrama. Avisar desde já sobre o cold start.</p></div>
+      <div class="rot-block"><h4>7–9 · Execução <span class="t">3 min</span></h4><p>Contar a ausência do SQL Editor, os dois erros e como foram corrigidos. Destacar os 15 tabelas e o retry de 60 s.</p></div>
+    </div>
+    <div>
+      <div class="rot-block"><h4>10–11 · Configuração e APK <span class="t">2 min</span></h4><p>Explicar as seis variáveis e o botão “Add from .env”. Mostrar que bastou mudar uma variável no GitHub.</p></div>
+      <div class="rot-block"><h4>12 · Evidências <span class="t">1 min</span></h4><p>Ler o healthcheck em voz alta e mostrar o login demo. Este é o momento de provar que funciona.</p></div>
+      <div class="rot-block"><h4>13–14 · Limites e lições <span class="t">1,5 min</span></h4><p>Ser honesto sobre as limitações do gratuito e fechar com os próximos passos.</p></div>
+      <div class="rot-block"><h4>Dica final <span class="t">—</span></h4><p>Se for apresentar ao vivo, abra o link da API um minuto antes para aquecer o serviço da Render.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>FreelaMZ · Roteiro</span><span>15 / 15</span></div>
+</section>
+
+</body>
+</html>

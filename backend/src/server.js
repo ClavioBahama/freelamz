@@ -17,9 +17,12 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = '0.0.0.0';
 const EM_PRODUCAO = emProducao();
 const VERBOSO = !EM_PRODUCAO || process.env.LOG_VERBOSE === 'true';
-/* Revisão do deploy (Railway expõe o SHA do commit). */
+/* Revisão do deploy (Railway e Render expõem o SHA do commit). */
 const REVISAO = String(
-  process.env.RAILWAY_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'local'
+  process.env.RAILWAY_GIT_COMMIT_SHA
+    || process.env.RENDER_GIT_COMMIT
+    || process.env.GIT_COMMIT
+    || 'local'
 ).slice(0, 7);
 
 /* Atrás do proxy do Railway (HTTPS terminado à frente). */

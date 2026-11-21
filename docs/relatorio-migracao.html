@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<title>FreelaMZ — Relatório de Migração da Infraestrutura</title>
+<style>
+  @page { size: A4; margin: 17mm 15mm 19mm 15mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Segoe UI Variable", Calibri, system-ui, sans-serif;
+    font-size: 10.5pt; line-height: 1.6; color: #1e293b;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  .cover {
+    width: 210mm; height: 297mm;
+    margin: -17mm -15mm -19mm -15mm;
+    background: #0b1b3f; color: #fff;
+    padding: 26mm 22mm 20mm 22mm;
+    position: relative; overflow: hidden; page-break-after: always;
+  }
+  .cover::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 85% 8%, rgba(37,99,235,0.55), transparent 55%),
+      radial-gradient(circle at 8% 95%, rgba(255,122,24,0.28), transparent 55%);
+  }
+  .cover > * { position: relative; }
+  .cover .rule { width: 60mm; height: 4px; background: #2563eb; border-radius: 2px; margin: 0 0 10mm 0; }
+  .cover .tipo { font-size: 10pt; letter-spacing: 3px; text-transform: uppercase; color: #93c5fd; font-weight: 800; }
+  .cover h1 { font-size: 40pt; line-height: 1.05; letter-spacing: -1.5px; margin: 6mm 0 4mm 0; color: #fff; font-weight: 900; }
+  .cover .sub { font-size: 14pt; line-height: 1.4; color: #dbeafe; max-width: 145mm; font-weight: 500; }
+  .cover .spacer { height: 40mm; }
+  .cover .meta { font-size: 10.5pt; color: #e2e8f0; line-height: 1.9; }
+  .cover .meta b { color: #fff; }
+  .cover .meta .label {
+    display: inline-block; width: 30mm; color: #93c5fd;
+    font-size: 8.5pt; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 800;
+  }
+  .cover .foot {
+    position: absolute; left: 22mm; right: 22mm; bottom: 16mm;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    padding-top: 5mm; font-size: 9pt; color: rgba(255,255,255,0.65);
+    display: flex; justify-content: space-between;
+  }
+
+  h1.sec { font-size: 16pt; color: #0b1b3f; font-weight: 900;
+    margin: 0 0 3mm 0; letter-spacing: -0.3px; break-after: avoid; }
+  h1.sec .n { color: #2563eb; }
+  h2 { font-size: 11.8pt; color: #12295e; font-weight: 800;
+    margin: 6mm 0 2mm 0; break-after: avoid; }
+  h3 { font-size: 10.6pt; color: #1e3a8a; font-weight: 800;
+    margin: 4mm 0 1.5mm 0; break-after: avoid; }
+  p { margin: 0 0 3mm 0; text-align: justify; hyphens: auto; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; text-align: justify; }
+  strong { color: #0b1b3f; }
+  .muted { color: #64748b; }
+  .small { font-size: 9pt; }
+
+  .secao { break-before: page; }
+  .secao:first-of-type { break-before: auto; }
+  .kicker { font-size: 8.5pt; letter-spacing: 2.2px; text-transform: uppercase;
+    color: #2563eb; font-weight: 800; margin: 0 0 1.5mm 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.8pt;
+    margin: 2mm 0 4mm 0; break-inside: avoid; }
+  caption { caption-side: top; text-align: left; font-size: 8.5pt;
+    color: #64748b; font-weight: 700; padding-bottom: 1.5mm; }
+  th { background: #eef4ff; color: #1e3a8a; text-align: left; font-weight: 800;
+    padding: 2mm 2.2mm; border: 1px solid #dbe4f3; font-size: 8.3pt; letter-spacing: 0.2px; }
+  td { padding: 1.8mm 2.2mm; border: 1px solid #e6ecf5; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #f8fafd; }
+
+  .callout { background: #f1f6ff; border-left: 4px solid #2563eb;
+    border-radius: 2mm; padding: 3mm 4mm; margin: 3mm 0 4mm 0;
+    font-size: 9.6pt; break-inside: avoid; }
+  .callout.warn { background: #fff8ec; border-left-color: #f59e0b; }
+  .callout.ok { background: #ecfdf5; border-left-color: #10b981; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .t { display: block; font-weight: 800; color: #0b1b3f;
+    font-size: 9.2pt; margin-bottom: 1mm; }
+
+  .diagram { display: flex; align-items: stretch; gap: 3mm;
+    margin: 3mm 0 4mm 0; break-inside: avoid; }
+  .dbox { flex: 1; border: 1px solid #dbe4f3; border-radius: 2.5mm;
+    background: #fff; padding: 3.5mm 3mm; text-align: center; }
+  .dbox .ic { font-size: 15pt; line-height: 1; margin-bottom: 1.5mm; }
+  .dbox b { display: block; font-size: 9.2pt; color: #0b1b3f; margin-bottom: 0.8mm; }
+  .dbox span { font-size: 8pt; color: #64748b; line-height: 1.4; display: block; }
+  .darrow { display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; font-size: 14pt; min-width: 8mm; }
+
+  .stats { display: flex; gap: 3mm; margin: 3mm 0 4mm 0; break-inside: avoid; }
+  .stat { flex: 1; border: 1px solid #dbe4f3; border-radius: 2.5mm;
+    background: #fff; padding: 3mm; text-align: center; }
+  .stat .v { font-size: 20pt; font-weight: 900; color: #2563eb;
+    line-height: 1; letter-spacing: -0.5px; }
+  .stat .l { font-size: 7.8pt; color: #64748b; font-weight: 700;
+    margin-top: 1.2mm; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .toc { margin: 2mm 0 0 0; }
+  .toc div { display: flex; align-items: baseline; gap: 2mm;
+    padding: 1.4mm 0; border-bottom: 1px dotted #dbe4f3; font-size: 10pt; }
+  .toc .num { color: #2563eb; font-weight: 800; min-width: 9mm; }
+  .toc .tt { color: #1e293b; font-weight: 600; }
+  .toc .sub { padding-left: 9mm; font-size: 9.3pt; color: #475569;
+    border-bottom: none; padding-top: 0.8mm; padding-bottom: 0.8mm; }
+
+  .refs p { text-align: left; font-size: 9.3pt; line-height: 1.55;
+    margin-bottom: 2.4mm; padding-left: 6mm; text-indent: -6mm; }
+
+  code, .mono { font-family: Consolas, "Courier New", monospace;
+    font-size: 8.6pt; background: #f1f5f9; padding: 0.4mm 1mm; border-radius: 1mm; }
+  pre { background: #0b1b3f; color: #dbeafe; padding: 3mm 4mm; border-radius: 2mm;
+    font-family: Consolas, "Courier New", monospace; font-size: 8.2pt;
+    line-height: 1.5; white-space: pre-wrap; break-inside: avoid; margin: 2mm 0 4mm 0; }
+
+  .signature { margin-top: 12mm; border-top: 1px solid #94a3b8;
+    width: 80mm; padding-top: 2mm; font-size: 9pt; color: #475569; text-align: center; }
+  .no-break { break-inside: avoid; }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="cover">
+  <div class="rule"></div>
+  <div class="tipo">Relatório técnico · estudo de caso</div>
+  <h1>Migração da infraestrutura do FreelaMZ</h1>
+  <div class="sub">Do Railway suspenso para Render + TiDB Cloud Starter: decisões, execução, incidentes e resultados</div>
+  <div class="spacer"></div>
+  <div class="meta">
+    <div><span class="label">Autor</span><b>Clávio Alfredo Chitsulete</b></div>
+    <div><span class="label">Contacto</span>claviochitsulete@gmail.com</div>
+    <div><span class="label">Projeto</span>github.com/ClavioBahama/freelamz</div>
+    <div><span class="label">Data</span>21 de novembro de 2026</div>
+    <div><span class="label">Versão</span>1.1 — pós-migração</div>
+  </div>
+  <div class="foot">
+    <span>Maputo, Moçambique</span>
+    <span>Relatório de Migração</span>
+  </div>
+</div>
+
+<!-- RESUMO -->
+<section>
+  <p class="kicker">Resumo</p>
+  <h1 class="sec">Migração do FreelaMZ para hospedagem gratuita</h1>
+  <p>
+    Este documento regista a migração da infraestrutura do <strong>FreelaMZ</strong> depois de o serviço de
+    hospedagem original (Railway) ter suspendido o backend e a base de dados por esgotamento de créditos.
+    O objetivo era manter a aplicação pública sem custos, preservar a compatibilidade com MySQL, continuar
+    a publicar automaticamente a partir do GitHub e não expor credenciais no código, no repositório ou na
+    comunicação com o assistente.
+  </p>
+  <p>
+    Após comparar oito alternativas com base em documentação oficial, escolheu-se a combinação
+    <strong>Render</strong> para o backend Node.js e <strong>TiDB Cloud Starter</strong> para a base de dados
+    compatível com MySQL. A migração foi executada sem alterações ao código da API, criando a base e as
+    tabelas por scripts próprios com ligação TLS, configurando seis variáveis de ambiente no painel da
+    Render e actualizando uma única variável do repositório para o pacote Android.
+  </p>
+  <p>
+    O resultado foi verificado com sucesso: healthcheck com base online, doze categorias, doze serviços,
+    login de demonstração com perfil de freelancer e um novo APK gerado automaticamente. O relatório
+    documenta também dois incidentes reais, as suas correcções, os limites dos planos gratuitos e o
+    trabalho futuro.
+  </p>
+  <p class="small muted" style="margin-top:5mm;">
+    <strong>Palavras-chave:</strong> migração; hospedagem gratuita; Render; TiDB Cloud; MySQL;
+    integração contínua; GitHub Actions; segurança de credenciais.
+  </p>
+</section>
+
+<!-- ÍNDICE -->
+<section class="secao">
+  <p class="kicker">Estrutura</p>
+  <h1 class="sec">Índice</h1>
+  <div class="toc">
+    <div><span class="num">1.</span><span class="tt">Contexto e formulação do problema</span></div>
+    <div><span class="num">2.</span><span class="tt">Objetivos e critérios de decisão</span></div>
+    <div><span class="num">3.</span><span class="tt">Alternativas avaliadas</span></div>
+    <div><span class="num">4.</span><span class="tt">Solução adotada e arquitetura</span></div>
+    <div><span class="num">5.</span><span class="tt">Execução da migração</span></div>
+    <div><span class="num">6.</span><span class="tt">Incidentes e correções</span></div>
+    <div><span class="num">7.</span><span class="tt">Resultados e validação</span></div>
+    <div><span class="num">8.</span><span class="tt">Segurança e gestão de segredos</span></div>
+    <div><span class="num">9.</span><span class="tt">Limitações e trabalho futuro</span></div>
+    <div><span class="num">10.</span><span class="tt">Conclusão</span></div>
+    <div><span class="num">—</span><span class="tt">Referências</span></div>
+    <div><span class="num">A.</span><span class="tt">Anexo A — ficheiros envolvidos</span></div>
+    <div><span class="num">B.</span><span class="tt">Anexo B — comandos principais</span></div>
+  </div>
+  <div class="callout" style="margin-top:8mm;">
+    <span class="t">Nota sobre o histórico</span>
+    <p>
+      O relatório original do projeto descreve a publicação no Railway e permanece no repositório como
+      registo histórico. Este documento complementa-o com a fase posterior de migração.
+    </p>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="secao">
+  <p class="kicker">Capítulo 1</p>
+  <h1 class="sec"><span class="n">1.</span> Contexto e formulação do problema</h1>
+  <p>
+    O FreelaMZ é um marketplace que liga clientes a freelancers em Moçambique. A primeira publicação da
+    API foi feita no Railway, com base MySQL gerida e deploy automático a partir do repositório GitHub.
+    O sistema esteve operacional com o endpoint <code>/api/health</code> a reportar <code>db:"up"</code>,
+    doze categorias, nove freelancers e doze serviços de demonstração.
+  </p>
+  <p>
+    Em determinado momento, os créditos da conta foram esgotados. O painel passou a mostrar os serviços
+    de backend e de base de dados com o estado <strong>Paused from exceeding limits</strong>, e a URL
+    pública deixou de responder. A estimativa de regresso dos créditos era de aproximadamente vinte dias,
+    prazo incompatível com a necessidade de manter a demonstração do projeto disponível.
+  </p>
+  <div class="callout warn">
+    <span class="t">Natureza do problema</span>
+    <p>
+      A falha não era de código: o backend, o esquema da base e o pipeline do APK estavam funcionais.
+      O risco identificado era a <strong>dependência de um único fornecedor</strong> com orçamento
+      limitado e sem plano verdadeiramente permanente para este caso de uso.
+    </p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="secao">
+  <p class="kicker">Capítulo 2</p>
+  <h1 class="sec"><span class="n">2.</span> Objetivos e critérios de decisão</h1>
+  <p>A escolha da nova plataforma obedeceu a seis critérios, todos verificáveis em documentação oficial:</p>
+  <ol>
+    <li><strong>Custo zero sustentável</strong> — plano gratuito sem cartão internacional e sem validade de trinta dias.</li>
+    <li><strong>Compatibilidade com MySQL</strong> — o projeto usa o driver <code>mysql2</code>, colunas <code>JSON</code>, <code>ENUM</code>, chaves estrangeiras e <code>information_schema</code>.</li>
+    <li><strong>Deploy automático por GitHub</strong> — ligação nativa ao repositório, sem copiar ficheiros manualmente.</li>
+    <li><strong>Segurança das credenciais</strong> — senhas e tokens introduzidos apenas nos painéis dos serviços, nunca no chat, no repositório ou no código.</li>
+    <li><strong>Comportamento previsível da quota</strong> — saber o que acontece quando o limite gratuito é atingido.</li>
+    <li><strong>Baixa manutenção</strong> — TLS gerido, healthcheck e reinício automático do serviço.</li>
+  </ol>
+  <p>
+    Ficou também definido que o projeto antigo só seria desligado <strong>depois</strong> de a nova
+    instalação estar integralmente validada, de forma a permitir recuar em caso de falha.
+  </p>
+</section>
+
+<!-- 3 -->
+<section class="secao">
+  <p class="kicker">Capítulo 3</p>
+  <h1 class="sec"><span class="n">3.</span> Alternativas avaliadas</h1>
+  <p>
+    As informações abaixo foram retiradas das páginas oficiais de preços e documentação. Quando um dado
+    não pôde ser confirmado, isso foi assinalado em vez de ser assumido.
+  </p>
+  <table>
+    <caption>Quadro comparativo dos serviços analisados</caption>
+    <thead><tr><th>Serviço</th><th>Gratuito</th><th>Cartão</th><th>Base de dados</th><th>Avaliação</th></tr></thead>
+    <tbody>
+      <tr><td>Render</td><td>Web Service Node.js, 0,1 CPU / 512 MB, 750 h/mês</td><td>Não para começar</td><td>Postgres grátis de 1 GB, expira em 30 dias; sem MySQL</td><td>Escolhido para backend</td></tr>
+      <tr><td>TiDB Cloud Starter</td><td>5 GiB linha + 5 GiB coluna + 50 M RU por instância; até 5 instâncias</td><td>A partir da 6.ª instância ou planos Scalable</td><td>Compatível com MySQL</td><td>Escolhido para base</td></tr>
+      <tr><td>alwaysdata Free</td><td>0 € para sempre, 1 GB SSD, 256 MB RAM, ¼ CPU, backups de 3 dias</td><td>Não</td><td>MariaDB (MySQL) incluída</td><td>Alternativa viável; deploy menos automático</td></tr>
+      <tr><td>Koyeb</td><td>Sem web service gratuito; Pro desde $29/mês</td><td>Sim</td><td>Postgres com 5 h/dia grátis</td><td>Descartado</td></tr>
+      <tr><td>PlanetScale</td><td>Sem plano gratuito visível</td><td>—</td><td>MySQL</td><td>Descartado</td></tr>
+      <tr><td>Glitch</td><td>Serviço encerrado em 2025</td><td>—</td><td>—</td><td>Descartado</td></tr>
+      <tr><td>Aiven</td><td>Free tier disponível</td><td>—</td><td>Não cobre MySQL</td><td>Descartado</td></tr>
+      <tr><td>Cyclic</td><td>Não foi possível confirmar</td><td>—</td><td>—</td><td>Descartado por falta de confirmação</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <span class="t">Compromisso conhecido da Render</span>
+    <p>
+      Um Web Service gratuito adormece após quinze minutos sem tráfego e demora cerca de um minuto a
+      voltar a responder. A própria documentação desaconselha estes planos para aplicações de produção.
+      Para uma demonstração académica, o impacto é aceitável e foi comunicado previamente.
+    </p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="secao">
+  <p class="kicker">Capítulo 4</p>
+  <h1 class="sec"><span class="n">4.</span> Solução adotada e arquitetura</h1>
+  <p>
+    Foi escolhida a combinação <strong>Render + TiDB Cloud Starter</strong>. A Render oferece o deploy
+    contínuo nativo por GitHub e aceita o comando de arranque já existente; o TiDB mantém a compatibilidade
+    com o código de acesso à base e disponibiliza uma quota mensal explícita que, quando esgotada,
+    estrangula a instância até ao mês seguinte sem gerar cobrança.
+  </p>
+  <div class="diagram">
+    <div class="dbox"><div class="ic">⬛</div><b>GitHub</b><span>repositório e variável VITE_API_URL</span></div>
+    <div class="darrow">→</div>
+    <div class="dbox"><div class="ic">⚙️</div><b>Actions</b><span>build do APK de debug</span></div>
+    <div class="darrow">→</div>
+    <div class="dbox"><div class="ic">🟩</div><b>Render</b><span>API Node.js em /api</span></div>
+    <div class="darrow">→</div>
+    <div class="dbox"><div class="ic">🗄️</div><b>TiDB</b><span>MySQL-compatível, TLS, porta 4000</span></div>
+  </div>
+  <p>
+    Um aspecto determinante foi o facto de o código já estar preparado para ambientes diferentes: o
+    módulo <code>dbConfig.js</code> aceita uma única <code>MYSQL_URL</code>, o servidor lê <code>PORT</code>
+    e escuta em <code>0,0,0,0</code>, o CORS é configurável por <code>CORS_ORIGINS</code> e o seed de
+    demonstração é controlado por <code>SEED_DEMO</code>. Por isso, <strong>nenhuma linha da lógica de
+    negócio precisou de mudar</strong> para a migração.
+  </p>
+  <div class="callout ok">
+    <span class="t">Decisão sobre os dados antigos</span>
+    <p>
+      Confirmou-se que não existiam dados reais no Railway além do catálogo de demonstração. A exportação
+      do dump foi portanto dispensada: o Railway não precisou de ser reactivado e a base nova foi povoada
+      pelo mecanismo de seed já implementado.
+    </p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="secao">
+  <p class="kicker">Capítulo 5</p>
+  <h1 class="sec"><span class="n">5.</span> Execução da migração</h1>
+
+  <h2>5.1 Criação da base sem SQL Editor</h2>
+  <p>
+    A consola do TiDB Cloud Starter disponibilizada não mostrava o SQL Editor. Em alternativa, foi
+    criado o script <code>backend/scripts/criar-base-tidb.js</code>, que liga com <code>mysql2</code> e
+    <code>ssl: {}</code> ao gateway da região São Paulo, executa
+    <code>CREATE DATABASE IF NOT EXISTS freelamz</code> com <code>utf8mb4_unicode_ci</code> e termina com
+    <code>SHOW DATABASES</code>. A senha é lida exclusivamente da variável <code>TIDB_PASSWORD</code> no
+    ficheiro local <code>backend/.env</code>.
+  </p>
+
+  <h2>5.2 Criação das tabelas</h2>
+  <p>
+    Verificou-se que o seed automático pressupõe a existência das tabelas. Foi então criado o script
+    <code>backend/scripts/preparar-tabelas-tidb.js</code>, que aplica, por ordem,
+    <code>database/schema.sql</code>, <code>database/seed.sql</code> e
+    <code>src/scripts/migrate.js</code>. O resultado foi de quinze tabelas, doze categorias e todas as
+    migrações da chamada FASE A (carteiras, transações, escrow, entregas e levantamentos).
+  </p>
+
+  <h2>5.3 Configuração da Render</h2>
+  <p>
+    Foi criado um Web Service ligado ao repositório, com Root Directory <code>backend</code>, comando de
+    compilação <code>npm install</code>, arranque <code>npm start</code>, plano Free e healthcheck em
+    <code>/api/health</code>. As variáveis de ambiente foram introduzidas no painel através do botão
+    <em>Add from .env</em>, usando um modelo limpo com apenas as seis variáveis necessárias.
+  </p>
+  <table>
+    <caption>Variáveis de ambiente de produção</caption>
+    <thead><tr><th>Variável</th><th>Finalidade</th></tr></thead>
+    <tbody>
+      <tr><td>MYSQL_URL</td><td>String de ligação ao cluster TiDB, com utilizador, senha, host, porta 4000 e base freelamz.</td></tr>
+      <tr><td>DB_SSL</td><td><code>true</code>; activa a encriptação da ligação.</td></tr>
+      <tr><td>JWT_SECRET</td><td>Chave aleatória para assinar tokens; gerada localmente.</td></tr>
+      <tr><td>NODE_ENV</td><td><code>production</code>.</td></tr>
+      <tr><td>CORS_ORIGINS</td><td>Origens web e esquemas usados pelo APK.</td></tr>
+      <tr><td>SEED_DEMO</td><td><code>true</code>; cria os dados de demonstração no arranque.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.4 Actualização do cliente e do APK</h2>
+  <p>
+    O frontend de desenvolvimento permaneceu com <code>VITE_API_URL=/api</code>, mantendo o proxy do Vite
+    para o servidor local. Para o APK, bastou alterar a variável de repositório <code>VITE_API_URL</code>
+    no GitHub para <code>https://freelamz.onrender.com/api</code> e disparar o workflow
+    <code>build-apk.yml</code>. Nem o workflow nem o ficheiro <code>capacitor.config.js</code> precisaram
+    de alterações, porque ambos já liam essa variável.
+  </p>
+</section>
+
+<!-- 6 -->
+<section class="secao">
+  <p class="kicker">Capítulo 6</p>
+  <h1 class="sec"><span class="n">6.</span> Incidentes e correções</h1>
+
+  <h2>6.1 Utilizador não preenchido</h2>
+  <p>
+    O primeiro arranque na Render reportou <code>db:"down"</code>. O endpoint de diagnóstico devolveu
+    <code>ER_UNKNOWN_ERROR: Missing user name prefix</code> e mostrou o utilizador como
+    <code>&lt;UTILIZADOR_TIDB&gt;</code>. O marcador do ficheiro de exemplo tinha sido colado
+    literalmente na <code>MYSQL_URL</code>. A correcção consistiu em substituí-lo pelo utilizador real
+    no painel da Render, mantendo o sufixo <code>.root</code> exigido pelo TiDB. A senha nunca apareceu
+    no diagnóstico.
+  </p>
+
+  <h2>6.2 Tabelas ausentes</h2>
+  <p>
+    Com a ligação corrigida, o healthcheck passou a mostrar <code>db:"up"</code>, mas o seed terminou com
+    <code>ER_NO_SUCH_TABLE: freelamz.categories</code>. Isto aconteceu porque a base nova estava vazia e o
+    código de demonstração assume o esquema já aplicado. A execução do script de tabelas descrito em 5.2
+    resolveu o problema sem necessidade de novo deploy: o servidor revalida a ligação e volta a tentar o
+    seed a cada sessenta segundos.
+  </p>
+  <div class="callout warn">
+    <span class="t">Diagnóstico útil</span>
+    <p>
+      O endpoint <code>/api/health/db</code> revela host, porta, base e estado da ligação, mas não a senha.
+      Foi decisivo para distinguir um erro de configuração de um erro de estrutura da base.
+    </p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="secao">
+  <p class="kicker">Capítulo 7</p>
+  <h1 class="sec"><span class="n">7.</span> Resultados e validação</h1>
+  <p>A migração foi considerada concluída depois das seguintes verificações:</p>
+  <table>
+    <caption>Verificações finais</caption>
+    <thead><tr><th>Verificação</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>GET /api/health</td><td><code>success:true</code>, <code>db:"up"</code>, seed concluído</td></tr>
+      <tr><td>GET /api/health/db</td><td>Ligação TLS ao gateway TiDB, base freelamz</td></tr>
+      <tr><td>GET /api/categories</td><td>HTTP 200, doze categorias</td></tr>
+      <tr><td>GET /api/services</td><td>HTTP 200, doze serviços</td></tr>
+      <tr><td>POST /api/auth/login</td><td>HTTP 200, perfil FREELANCER para a conta de demonstração</td></tr>
+      <tr><td>GitHub Actions</td><td>APK de debug gerado com sucesso, artefacto com cerca de 7,1 MB</td></tr>
+      <tr><td>Repositório</td><td>Commit publicado com documentação, scripts e relatórios</td></tr>
+    </tbody>
+  </table>
+  <div class="stats">
+    <div class="stat"><div class="v">15</div><div class="l">tabelas</div></div>
+    <div class="stat"><div class="v">12</div><div class="l">categorias</div></div>
+    <div class="stat"><div class="v">12</div><div class="l">serviços</div></div>
+    <div class="stat"><div class="v">0 €</div><div class="l">custo mensal</div></div>
+  </div>
+  <p class="small muted">
+    Conta de demonstração utilizada no teste: isabel@demo.freelamz.mz. A senha de demonstração é a mesma
+    do catálogo de exemplo e não constitui um segredo de produção.
+  </p>
+</section>
+
+<!-- 8 -->
+<section class="secao">
+  <p class="kicker">Capítulo 8</p>
+  <h1 class="sec"><span class="n">8.</span> Segurança e gestão de segredos</h1>
+  <p>
+    Uma regra explícita orientou toda a migração: nenhuma senha, token de acesso, <code>JWT_SECRET</code>
+    ou string de ligação com senha seria pedida ou partilhada na conversa. Na prática:
+  </p>
+  <ul>
+    <li>A senha do TiDB foi escrita pelo próprio utilizador no ficheiro local <code>backend/.env</code>, que está ignorado pelo Git.</li>
+    <li>Os scripts de criação da base e das tabelas leem essa variável do ambiente e nunca a imprimem; os erros são filtrados.</li>
+    <li>As variáveis de produção foram introduzidas directamente no painel da Render, incluindo o <code>JWT_SECRET</code> gerado localmente.</li>
+    <li>A actualização da variável do GitHub e o disparo do workflow foram feitos com a autenticação já existente da ferramenta de linha de comando, sem colar tokens.</li>
+    <li>O modelo <code>.env.render.example</code> contém apenas marcadores, nunca valores reais.</li>
+  </ul>
+  <div class="callout ok">
+    <span class="t">Resultado</span>
+    <p>
+      Nenhum segredo foi encontrado no repositório, nos ficheiros de documentação, nos logs apresentados
+      ou na comunicação durante a migração.
+    </p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="secao">
+  <p class="kicker">Capítulo 9</p>
+  <h1 class="sec"><span class="n">9.</span> Limitações e trabalho futuro</h1>
+  <p>
+    Os planos gratuitos envolvem compromissos que devem ser conhecidos. A Render adormece após quinze
+    minutos inactiva e o primeiro pedido pode demorar cerca de um minuto; além disso, esgotando as 750
+    horas mensais ou a banda incluída, os serviços gratuitos são suspensos. No TiDB, o esgotamento dos
+    cinquenta milhões de unidades de pedido estrangula a instância até ao mês seguinte.
+  </p>
+  <p>
+    O sistema de ficheiros da Render é efémero: imagens enviadas para a pasta de uploads desaparecem a
+    cada deploy. Para um produto real seria necessário armazenamento externo compatível com S3. A
+    publicação na Play Store também continua pendente, pois o APK actual é de depuração e ainda não foi
+    assinado com uma chave própria.
+  </p>
+  <p>Como trabalho futuro imediato ficaram definidos:</p>
+  <ol>
+    <li>Desligar o projeto antigo no Railway após a validação, hoje concluída.</li>
+    <li>Criar uma chave de assinatura e gerar um APK de lançamento.</li>
+    <li>Introduzir armazenamento externo para ficheiros enviados.</li>
+    <li>Acompanhar o consumo da quota do TiDB e da Render ao longo do mês.</li>
+  </ol>
+</section>
+
+<!-- 10 -->
+<section class="secao">
+  <p class="kicker">Capítulo 10</p>
+  <h1 class="sec"><span class="n">10.</span> Conclusão</h1>
+  <p>
+    A migração atingiu todos os objectivos fixados no início: a aplicação voltou a estar pública sem
+    custo, a compatibilidade com MySQL foi mantida, o deploy automático por GitHub continuou a funcionar
+    e nenhuma credencial foi exposta. O processo também mostrou que uma preparação prévia adequada —
+    variáveis de ambiente, healthchecks e scripts idempotentes — permite trocar de fornecedor sem
+    reescrever a aplicação.
+  </p>
+  <p>
+    Os dois incidentes encontrados não estavam no código, mas na configuração e na ordem das operações.
+    Foram resolvidos com diagnóstico baseado em evidências e registados neste documento para que uma
+    futura migração possa ser executada de forma ainda mais directa.
+  </p>
+  <div class="signature">Clávio Alfredo Chitsulete<br />Maputo, 21 de novembro de 2026</div>
+</section>
+
+<!-- REFERÊNCIAS -->
+<section class="secao refs">
+  <p class="kicker">Fontes</p>
+  <h1 class="sec">Referências</h1>
+  <p>Render. <em>Deploy for Free</em>. Disponível em: https://docs.render.com/free</p>
+  <p>Render. <em>Environment Variables and Secrets</em>. Disponível em: https://docs.render.com/configure-environment-variables</p>
+  <p>PingCAP. <em>TiDB Cloud Starter Pricing Details</em>. Disponível em: https://www.pingcap.com/tidb-cloud-starter-pricing-details/</p>
+  <p>alwaysdata. <em>Pricing</em>. Disponível em: https://www.alwaysdata.com/en/pricing/</p>
+  <p>alwaysdata. <em>Which plan to choose?</em>. Disponível em: https://help.alwaysdata.com/en/docs/admin-billing/billing/choose-its-paas/</p>
+  <p>Koyeb. <em>Pricing</em>. Disponível em: https://www.koyeb.com/pricing</p>
+  <p>Repositório do projeto. <em>Guia de migração</em>. docs/migracao-render-tidb.md</p>
+</section>
+
+<!-- ANEXO A -->
+<section class="secao">
+  <p class="kicker">Anexo A</p>
+  <h1 class="sec">Ficheiros envolvidos na migração</h1>
+  <table>
+    <thead><tr><th>Ficheiro</th><th>Alteração</th></tr></thead>
+    <tbody>
+      <tr><td>backend/src/server.js</td><td>Healthcheck passou a reconhecer o SHA do commit da Render.</td></tr>
+      <tr><td>backend/scripts/criar-base-tidb.js</td><td>Criação da base com TLS e verificação por SHOW DATABASES.</td></tr>
+      <tr><td>backend/scripts/preparar-tabelas-tidb.js</td><td>Aplicação de schema, seed e migrações no TiDB.</td></tr>
+      <tr><td>backend/.env.render.example</td><td>Modelo seguro para o botão Add from .env.</td></tr>
+      <tr><td>docs/migracao-render-tidb.md</td><td>Guia operacional detalhado da migração.</td></tr>
+      <tr><td>README.md e RELATORIO.md</td><td>Nova URL e avisos de actualização.</td></tr>
+      <tr><td>.env e ficheiros com senhas</td><td>Não foram versionados nem partilhados.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ANEXO B -->
+<section class="secao">
+  <p class="kicker">Anexo B</p>
+  <h1 class="sec">Comandos principais</h1>
+  <pre>Criar a base no TiDB
+  node backend/scripts/criar-base-tidb.js
+
+Criar tabelas e aplicar migrações
+  cd backend
+  node scripts/preparar-tabelas-tidb.js
+
+Verificar a API publicada
+  curl.exe -s https://freelamz.onrender.com/api/health
+  curl.exe -s https://freelamz.onrender.com/api/health/db
+
+Apontar o APK para a nova API
+  gh variable set VITE_API_URL --repo ClavioBahama/freelamz \
+      --body "https://freelamz.onrender.com/api"
+  gh workflow run build-apk.yml --repo ClavioBahama/freelamz
+
+Gerar o JWT_SECRET localmente
+  node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"</pre>
+  <p class="small muted">
+    Os comandos que usam a senha do TiDB não a apresentam: ela é lida do ficheiro local de ambiente.
+  </p>
+</section>
+
+</body>
+</html>
