@@ -6,7 +6,9 @@ Marketplace de freelancers focado em Moçambique. Encontre talentos. Encontre op
 
 **Documentação:**
 - [Relatório completo do projeto](RELATORIO.md) — o que foi feito, passo a passo, problemas e soluções
+- [Relatório académico (PDF A4)](docs/FreelaMZ-Relatorio.pdf) — documento formal para entrega ao docente (fonte: [docs/relatorio-academico.html](docs/relatorio-academico.html))
 - [Apresentação em PDF](docs/FreelaMZ-Apresentacao.pdf) — 14 slides + roteiro de fala (fonte: [docs/apresentacao.html](docs/apresentacao.html))
+- [Migração Railway → Render + TiDB](docs/migracao-render-tidb.md) — guia operacional da hospedagem gratuita actual
 
 ---
 
@@ -126,7 +128,9 @@ O estado da base de dados é `http://localhost:3000/api/health/db`.
 
 ## 3.1. Deploy no Railway (backend)
 
-O backend é publicado como um serviço Node.js no [Railway](https://railway.com) e usa o **MySQL do próprio Railway**. O repositório é um monorepo, por isso o serviço **tem de** apontar para a subpasta `backend`.
+> **Histórico — não é o deploy actual (21/11/2026).** O backend passou para a **Render** em `https://freelamz.onrender.com`, com a base num cluster **TiDB Cloud Starter** compatível com MySQL. Ver o [guia de migração](docs/migracao-render-tidb.md). As instruções abaixo ficam apenas como registo do que foi feito no Railway.
+
+O backend era publicado como um serviço Node.js no [Railway](https://railway.com) e usava o **MySQL do próprio Railway**. O repositório é um monorepo, por isso o serviço **tem de** apontar para a subpasta `backend`.
 
 ### Configuração do serviço
 

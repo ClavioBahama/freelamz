@@ -7,6 +7,10 @@
 
 ---
 
+> **Actualização — 21 de novembro de 2026:** o Railway foi abandonado depois de os serviços terem ficado pausados por excesso de créditos. O backend está agora na **Render** (`https://freelamz.onrender.com`) e a base de dados num cluster **TiDB Cloud Starter** (compatível com MySQL). O conteúdo abaixo permanece como registo histórico do trabalho no Railway. Guia operacional da migração: [docs/migracao-render-tidb.md](docs/migracao-render-tidb.md).
+
+---
+
 ## 1. Resumo executivo
 
 O FreelaMZ é um marketplace que liga clientes a freelancers em Moçambique. Este relatório

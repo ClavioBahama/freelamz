@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<title>FreelaMZ — Relatório do Projeto</title>
+<style>
+  /* As margens são passadas também ao motor de impressão (DevTools), para que o
+     rodapé "Página X de N" fique sempre na mesma zona. */
+  @page { size: A4; margin: 17mm 15mm 19mm 15mm; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: "Segoe UI", "Segoe UI Variable", Calibri, system-ui, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: #1e293b;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------------- CAPA ---------------- */
+  .cover {
+    width: 210mm;
+    height: 297mm;
+    /* bleed: ocupa também as margens da folha */
+    margin: -17mm -15mm -19mm -15mm;
+    background: #0b1b3f;
+    color: #fff;
+    padding: 26mm 22mm 20mm 22mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 85% 8%, rgba(37,99,235,0.55), transparent 55%),
+      radial-gradient(circle at 8% 95%, rgba(255,122,24,0.28), transparent 55%);
+  }
+  .cover > * { position: relative; }
+  .cover .rule { width: 60mm; height: 4px; background: #2563eb; border-radius: 2px; margin: 0 0 10mm 0; }
+  .cover .tipo { font-size: 10pt; letter-spacing: 3px; text-transform: uppercase; color: #93c5fd; font-weight: 800; }
+  .cover h1 { font-size: 46pt; line-height: 1.02; letter-spacing: -1.5px; margin: 6mm 0 4mm 0; color: #fff; font-weight: 900; }
+  .cover .sub { font-size: 14pt; line-height: 1.4; color: #dbeafe; max-width: 140mm; font-weight: 500; }
+  .cover .spacer { height: 46mm; }
+  .cover .meta { font-size: 10.5pt; color: #e2e8f0; line-height: 1.9; }
+  .cover .meta b { color: #fff; }
+  .cover .meta .label {
+    display: inline-block; width: 30mm; color: #93c5fd;
+    font-size: 8.5pt; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 800;
+  }
+  .cover .foot {
+    position: absolute; left: 22mm; right: 22mm; bottom: 16mm;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    padding-top: 5mm;
+    font-size: 9pt; color: rgba(255,255,255,0.65);
+    display: flex; justify-content: space-between;
+  }
+
+  /* ---------------- ESTRUTURA ---------------- */
+  h1.sec {
+    font-size: 16pt; color: #0b1b3f; font-weight: 900;
+    margin: 0 0 3mm 0; letter-spacing: -0.3px;
+    break-after: avoid;
+  }
+  h1.sec .n { color: #2563eb; }
+  h2 {
+    font-size: 11.8pt; color: #12295e; font-weight: 800;
+    margin: 6mm 0 2mm 0; break-after: avoid;
+  }
+  h3 {
+    font-size: 10.6pt; color: #1e3a8a; font-weight: 800;
+    margin: 4mm 0 1.5mm 0; break-after: avoid;
+  }
+  p { margin: 0 0 3mm 0; text-align: justify; hyphens: auto; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; text-align: justify; }
+  strong { color: #0b1b3f; }
+  .muted { color: #64748b; }
+  .small { font-size: 9pt; }
+
+  .secao { break-before: page; }
+  .secao:first-of-type { break-before: auto; }
+
+  .kicker {
+    font-size: 8.5pt; letter-spacing: 2.2px; text-transform: uppercase;
+    color: #2563eb; font-weight: 800; margin: 0 0 1.5mm 0;
+  }
+
+  /* ---------------- TABELAS ---------------- */
+  table {
+    width: 100%; border-collapse: collapse; font-size: 8.8pt;
+    margin: 2mm 0 4mm 0; break-inside: avoid;
+  }
+  caption {
+    caption-side: top; text-align: left;
+    font-size: 8.5pt; color: #64748b; font-weight: 700;
+    padding-bottom: 1.5mm;
+  }
+  th {
+    background: #eef4ff; color: #1e3a8a;
+    text-align: left; font-weight: 800;
+    padding: 2mm 2.2mm; border: 1px solid #dbe4f3;
+    font-size: 8.3pt; letter-spacing: 0.2px;
+  }
+  td {
+    padding: 1.8mm 2.2mm; border: 1px solid #e6ecf5; vertical-align: top;
+  }
+  tbody tr:nth-child(even) td { background: #f8fafd; }
+
+  /* ---------------- CAIXAS ---------------- */
+  .callout {
+    background: #f1f6ff; border-left: 4px solid #2563eb;
+    border-radius: 2mm; padding: 3mm 4mm; margin: 3mm 0 4mm 0;
+    font-size: 9.6pt; break-inside: avoid;
+  }
+  .callout.warn { background: #fff8ec; border-left-color: #f59e0b; }
+  .callout.ok { background: #ecfdf5; border-left-color: #10b981; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .t {
+    display: block; font-weight: 800; color: #0b1b3f;
+    font-size: 9.2pt; margin-bottom: 1mm;
+  }
+
+  /* ---------------- DIAGRAMA ---------------- */
+  .diagram {
+    display: flex; align-items: stretch; gap: 3mm;
+    margin: 3mm 0 4mm 0; break-inside: avoid;
+  }
+  .dbox {
+    flex: 1; border: 1px solid #dbe4f3; border-radius: 2.5mm;
+    background: #fff; padding: 3.5mm 3mm; text-align: center;
+  }
+  .dbox .ic { font-size: 15pt; line-height: 1; margin-bottom: 1.5mm; }
+  .dbox b { display: block; font-size: 9.2pt; color: #0b1b3f; margin-bottom: 0.8mm; }
+  .dbox span { font-size: 8pt; color: #64748b; line-height: 1.4; display: block; }
+  .darrow {
+    display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; font-size: 14pt; min-width: 8mm;
+  }
+
+  /* ---------------- ESTATÍSTICAS ---------------- */
+  .stats { display: flex; gap: 3mm; margin: 3mm 0 4mm 0; break-inside: avoid; }
+  .stat {
+    flex: 1; border: 1px solid #dbe4f3; border-radius: 2.5mm;
+    background: #fff; padding: 3mm; text-align: center;
+  }
+  .stat .v { font-size: 20pt; font-weight: 900; color: #2563eb; line-height: 1; letter-spacing: -0.5px; }
+  .stat .l { font-size: 7.8pt; color: #64748b; font-weight: 700; margin-top: 1.2mm; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ---------------- ÍNDICE ---------------- */
+  .toc { margin: 2mm 0 0 0; }
+  .toc div {
+    display: flex; align-items: baseline; gap: 2mm;
+    padding: 1.4mm 0; border-bottom: 1px dotted #dbe4f3;
+    font-size: 10pt;
+  }
+  .toc .num { color: #2563eb; font-weight: 800; min-width: 9mm; }
+  .toc .tt { color: #1e293b; font-weight: 600; }
+  .toc .sub { padding-left: 9mm; font-size: 9.3pt; color: #475569; border-bottom: none; padding-top: 0.8mm; padding-bottom: 0.8mm; }
+
+  /* ---------------- REFERÊNCIAS ---------------- */
+  .refs p {
+    text-align: left; font-size: 9.3pt; line-height: 1.55;
+    margin-bottom: 2.4mm; padding-left: 6mm; text-indent: -6mm;
+  }
+
+  .signature {
+    margin-top: 12mm; border-top: 1px solid #94a3b8;
+    width: 80mm; padding-top: 2mm; font-size: 9pt; color: #475569; text-align: center;
+  }
+
+  .no-break { break-inside: avoid; }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<!-- ==================== CAPA ==================== -->
+<div class="cover">
+  <div class="rule"></div>
+  <div class="tipo">Relatório de Projeto</div>
+
+  <h1>FreelaMZ</h1>
+  <div class="sub">Plataforma de contratação de freelancers em Moçambique</div>
+
+  <div class="spacer"></div>
+
+  <div class="meta">
+    <div><span class="label">Autor</span><b>Clávio Alfredo Chitsulete</b></div>
+    <div><span class="label">Contacto</span>claviochitsulete@gmail.com</div>
+    <div><span class="label">Projeto</span>github.com/ClavioBahama/freelamz</div>
+    <div><span class="label">Versão</span>1.0.0</div>
+  </div>
+
+  <div class="foot">
+    <span>Maputo, Moçambique</span>
+    <span>Novembro de 2026</span>
+  </div>
+</div>
+
+<!-- ==================== RESUMO ==================== -->
+<section>
+  <p class="kicker">Resumo</p>
+  <h1 class="sec">FreelaMZ — plataforma de contratação de freelancers em Moçambique</h1>
+
+  <p>
+    Este relatório descreve o desenvolvimento e a implantação do <strong>FreelaMZ</strong>, uma
+    plataforma digital que liga clientes a profissionais independentes (freelancers) em
+    Moçambique. O ponto de partida foi um problema concreto: existe muito talento no país, mas a
+    contratação acontece sobretudo por indicação ou em grupos de mensagens, sem histórico,
+    reputação nem registo do acordo.
+  </p>
+  <p>
+    A solução foi construída como uma aplicação <em>web</em> progressiva com aspeto de aplicação
+    nativa, empacotada para Android, suportada por uma API REST e uma base de dados relacional.
+    A plataforma cobre o percurso completo de um trabalho: publicação de serviços, envio e
+    aceitação de propostas, gestão de projetos, mensagens, carteira com mecanismo de garantia
+    (<em>escrow</em>), avaliações e notificações.
+  </p>
+  <p>
+    O sistema foi publicado em ambiente de nuvem, com base de dados gerida, e o pacote Android é
+    gerado automaticamente por integração contínua. Os resultados incluem uma API pública
+    funcional, 130 verificações automáticas aprovadas e uma aplicação instalável. O relatório
+    documenta ainda as dificuldades encontradas, as decisões técnicas tomadas e o trabalho futuro
+    necessário para transformar o protótipo num produto em produção.
+  </p>
+
+  <p class="small muted" style="margin-top:5mm;">
+    <strong>Palavras-chave:</strong> marketplace; freelancers; Moçambique; React; Node.js;
+    MySQL; API REST; Android; integração contínua.
+  </p>
+</section>
+
+<!-- ==================== ÍNDICE ==================== -->
+<section class="secao">
+  <p class="kicker">Estrutura</p>
+  <h1 class="sec">Índice</h1>
+
+  <div class="toc">
+    <div><span class="num">1.</span><span class="tt">Introdução</span></div>
+    <div class="sub">1.1 Contexto · 1.2 Problema · 1.3 Objetivos · 1.4 Justificação</div>
+    <div><span class="num">2.</span><span class="tt">Requisitos e público-alvo</span></div>
+    <div class="sub">2.1 Perfis de utilizador · 2.2 Funcionalidades · 2.3 Requisitos não funcionais</div>
+    <div><span class="num">3.</span><span class="tt">Arquitetura e tecnologias</span></div>
+    <div class="sub">3.1 Visão geral · 3.2 Stack tecnológica · 3.3 Modelo de dados</div>
+    <div><span class="num">4.</span><span class="tt">Metodologia e desenvolvimento</span></div>
+    <div class="sub">4.1 Fases do trabalho · 4.2 Decisões técnicas · 4.3 Controlo de versões</div>
+    <div><span class="num">5.</span><span class="tt">Implantação e publicação</span></div>
+    <div class="sub">5.1 Backend · 5.2 Variáveis de ambiente · 5.3 Base de dados · 5.4 Aplicação Android</div>
+    <div><span class="num">6.</span><span class="tt">Resultados e testes</span></div>
+    <div class="sub">6.1 Estado atual · 6.2 Verificações · 6.3 Dados de demonstração</div>
+    <div><span class="num">7.</span><span class="tt">Dificuldades encontradas e soluções</span></div>
+    <div><span class="num">8.</span><span class="tt">Segurança e privacidade</span></div>
+    <div><span class="num">9.</span><span class="tt">Limitações e trabalho futuro</span></div>
+    <div><span class="num">10.</span><span class="tt">Conclusão</span></div>
+    <div><span class="num">—</span><span class="tt">Referências bibliográficas</span></div>
+    <div><span class="num">A.</span><span class="tt">Anexo A — Credenciais de teste</span></div>
+    <div><span class="num">B.</span><span class="tt">Anexo B — Comandos e estrutura do projeto</span></div>
+  </div>
+
+  <div class="callout" style="margin-top:8mm;">
+    <span class="t">Como ler este documento</span>
+    <p>
+      Os capítulos 1 a 3 apresentam o problema e a solução; os capítulos 4 e 5 descrevem como o
+      sistema foi construído e publicado; os capítulos 6 a 8 apresentam resultados, dificuldades
+      e aspetos de segurança; os capítulos 9 e 10 fecham com limitações e conclusão.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 1. INTRODUÇÃO ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 1</p>
+  <h1 class="sec"><span class="n">1.</span> Introdução</h1>
+
+  <h2>1.1 Contexto</h2>
+  <p>
+    A economia digital moçambicana tem crescido e com ela a procura de serviços especializados:
+    criação de sites, design gráfico, gestão de redes sociais, fotografia, redação, contabilidade
+    e desenvolvimento de aplicações. Em paralelo, muitos jovens adquiriram competências técnicas
+    e trabalham de forma independente.
+  </p>
+  <p>
+    Apesar disso, o encontro entre quem oferece e quem procura esses serviços continua a depender
+    de canais informais. O resultado é um mercado pouco transparente, onde o preço varia sem
+    critério, o prazo raramente é registado e a qualidade não é comparável.
+  </p>
+
+  <h2>1.2 Problema</h2>
+  <p>O problema pode ser resumido em três pontos:</p>
+  <ol>
+    <li><strong>Procura dispersa.</strong> O cliente não tem um lugar único onde encontrar e comparar profissionais.</li>
+    <li><strong>Ausência de reputação.</strong> Não existe histórico público de trabalhos concluídos nem avaliações verificáveis.</li>
+    <li><strong>Acordos informais.</strong> Preço, prazo e entrega são combinados em conversas privadas, sem qualquer registo.</li>
+  </ol>
+
+  <h2>1.3 Objetivos</h2>
+  <p>
+    <strong>Objetivo geral:</strong> conceber, desenvolver e publicar uma plataforma que organize
+    a contratação de freelancers em Moçambique, do primeiro contacto ao pagamento.
+  </p>
+  <p><strong>Objetivos específicos:</strong></p>
+  <ul>
+    <li>Modelar os perfis de cliente, freelancer e administrador, com permissões distintas.</li>
+    <li>Implementar o fluxo completo: serviço → proposta → projeto → entrega → avaliação.</li>
+    <li>Disponibilizar uma API REST documentada e uma aplicação Android instalável.</li>
+    <li>Publicar o sistema em nuvem, com base de dados gerida e implantação automatizada.</li>
+    <li>Validar o funcionamento com testes automáticos e utilização real num telemóvel.</li>
+  </ul>
+
+  <h2>1.4 Justificação</h2>
+  <p>
+    A plataforma reduz o custo de procura para o cliente, dá visibilidade ao freelancer e cria
+    confiança através de reputação e registo. Para além do valor imediato, o projeto serve como
+    estudo aplicado de arquitetura cliente-servidor, autenticação, modelação de dados e
+    implantação contínua — competências centrais na engenharia de software atual.
+  </p>
+</section>
+
+<!-- ==================== 2. REQUISITOS ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 2</p>
+  <h1 class="sec"><span class="n">2.</span> Requisitos e público-alvo</h1>
+
+  <h2>2.1 Perfis de utilizador</h2>
+  <table>
+    <caption>Tabela 1 — Perfis e responsabilidades</caption>
+    <thead>
+      <tr><th style="width:18%;">Perfil</th><th style="width:41%;">Pode fazer</th><th>Valor para o utilizador</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Cliente</strong></td>
+        <td>Explorar serviços, comparar perfis, enviar propostas, acompanhar projetos, pagar e avaliar.</td>
+        <td>Encontra profissionais num só lugar, com preço e reputação visíveis.</td>
+      </tr>
+      <tr>
+        <td><strong>Freelancer</strong></td>
+        <td>Criar perfil e portfólio, publicar serviços, responder a propostas, entregar trabalho e receber.</td>
+        <td>Ganha uma vitrine digital e constrói histórico profissional.</td>
+      </tr>
+      <tr>
+        <td><strong>Administrador</strong></td>
+        <td>Gerir utilizadores, serviços, categorias e disputas.</td>
+        <td>Mantém a plataforma organizada, segura e sem abusos.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2.2 Funcionalidades</h2>
+  <table>
+    <caption>Tabela 2 — Funcionalidades implementadas</caption>
+    <thead>
+      <tr><th style="width:26%;">Módulo</th><th>Descrição</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Autenticação</td><td>Registo, login, sessão com JWT e recuperação de palavra-passe.</td></tr>
+      <tr><td>Perfis</td><td>Dados pessoais, bio, localização, competências, portfólio e ligações sociais.</td></tr>
+      <tr><td>Serviços</td><td>Publicação, edição, imagens, preço, prazo e estado (ativo/inativo).</td></tr>
+      <tr><td>Propostas</td><td>Envio pelo cliente, aceitação/recusa pelo freelancer e negociação de valor.</td></tr>
+      <tr><td>Projetos</td><td>Estados de execução, entrega, aprovação e conclusão.</td></tr>
+      <tr><td>Mensagens</td><td>Conversas associadas a projetos, com contagem de não lidas.</td></tr>
+      <tr><td>Carteira e escrow</td><td>Saldo, depósitos simulados (M-Pesa/e-Mola/cartão) e libertação de valores.</td></tr>
+      <tr><td>Avaliações</td><td>Nota e comentário após conclusão, com média no perfil.</td></tr>
+      <tr><td>Favoritos e notificações</td><td>Guarda de serviços e avisos dentro da aplicação.</td></tr>
+      <tr><td>Administração</td><td>Gestão de utilizadores, serviços, categorias e disputas.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.3 Requisitos não funcionais</h2>
+  <ul>
+    <li><strong>Usabilidade:</strong> interface responsiva, com aspeto nativo e suporte a <em>notch</em> em telemóveis.</li>
+    <li><strong>Desempenho:</strong> respostas da API na ordem das centenas de milissegundos em ligação móvel.</li>
+    <li><strong>Segurança:</strong> palavras-passe com <em>hash</em>, sessões assinadas e validação de permissões.</li>
+    <li><strong>Disponibilidade:</strong> o serviço mantém-se online mesmo com a base de dados temporariamente indisponível.</li>
+    <li><strong>Portabilidade:</strong> a mesma API serve a aplicação Android, o site e os testes automatizados.</li>
+  </ul>
+</section>
+
+<!-- ==================== 3. ARQUITETURA ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 3</p>
+  <h1 class="sec"><span class="n">3.</span> Arquitetura e tecnologias</h1>
+
+  <h2>3.1 Visão geral</h2>
+  <p>
+    O sistema segue uma arquitetura cliente-servidor em três camadas. A aplicação Android e o
+    site consomem a mesma API REST, que concentra as regras de negócio e comunica com a base de
+    dados relacional.
+  </p>
+
+  <div class="diagram">
+    <div class="dbox">
+      <div class="ic">📱</div>
+      <b>Aplicação Android</b>
+      <span>React + Framework7<br />empacotada com Capacitor</span>
+    </div>
+    <div class="darrow">⇄</div>
+    <div class="dbox">
+      <div class="ic">⚙️</div>
+      <b>API REST</b>
+      <span>Node.js + Express<br />JWT + bcrypt</span>
+    </div>
+    <div class="darrow">⇄</div>
+    <div class="dbox">
+      <div class="ic">🗄️</div>
+      <b>Base de dados</b>
+      <span>MySQL gerido<br />na nuvem (Railway)</span>
+    </div>
+  </div>
+
+  <p>
+    A comunicação é feita por HTTPS, em formato JSON. A API está organizada por domínios
+    (<em>auth</em>, <em>users</em>, <em>services</em>, <em>proposals</em>, <em>projects</em>,
+    <em>messages</em>, <em>payments</em>, <em>admin</em>), o que facilita a manutenção e a
+    evolução independente de cada módulo.
+  </p>
+
+  <h2>3.2 Stack tecnológica</h2>
+  <table>
+    <caption>Tabela 3 — Tecnologias utilizadas</caption>
+    <thead>
+      <tr><th style="width:22%;">Camada</th><th style="width:30%;">Tecnologia</th><th>Motivo da escolha</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Interface</td><td>React 18 + Framework7 8 + Vite</td><td>Componentes reutilizáveis, aspeto nativo e compilação rápida.</td></tr>
+      <tr><td>Aplicação nativa</td><td>Capacitor 8</td><td>Reutiliza o mesmo código web para gerar o Android.</td></tr>
+      <tr><td>Servidor</td><td>Node.js + Express 4</td><td>Simplicidade, ecossistema maduro e boa integração com MySQL.</td></tr>
+      <tr><td>Base de dados</td><td>MySQL 8 (mysql2)</td><td>Modelo relacional adequado a utilizadores, projetos e pagamentos.</td></tr>
+      <tr><td>Autenticação</td><td>JWT + bcrypt</td><td>Sessões sem estado e armazenamento seguro de palavras-passe.</td></tr>
+      <tr><td>Nuvem</td><td>Railway</td><td>Implantação simples com base de dados gerida no mesmo projeto.</td></tr>
+      <tr><td>Integração contínua</td><td>GitHub Actions</td><td>Gera o APK sem necessidade de Android Studio local.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.3 Modelo de dados</h2>
+  <p>
+    A base de dados tem 15 tabelas. As principais são <strong>users</strong> (contas),
+    <strong>profiles</strong> (perfil profissional), <strong>categories</strong> e
+    <strong>skills</strong> (catálogo), <strong>services</strong> (oferta),
+    <strong>proposals</strong> (negociação), <strong>projects</strong> (execução),
+    <strong>messages</strong> (comunicação), <strong>reviews</strong> (reputação) e
+    <strong>wallets</strong> (saldo e <em>escrow</em>).
+  </p>
+  <p>
+    As chaves estrangeiras garantem integridade referencial com remoção em cascata onde faz
+    sentido, e existem índices nas colunas mais consultadas (estado do projeto, destinatário da
+    mensagem, categoria do serviço).
+  </p>
+</section>
+
+<!-- ==================== 4. METODOLOGIA ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 4</p>
+  <h1 class="sec"><span class="n">4.</span> Metodologia e desenvolvimento</h1>
+
+  <h2>4.1 Fases do trabalho</h2>
+  <p>
+    O desenvolvimento seguiu uma abordagem incremental: cada fase produziu uma versão
+    potencialmente utilizável, testada antes de avançar. A Tabela 4 resume a cronologia.
+  </p>
+
+  <table>
+    <caption>Tabela 4 — Fases, objetivos e resultados</caption>
+    <thead>
+      <tr><th style="width:7%;">Fase</th><th style="width:30%;">Objetivo</th><th>Resultado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Preparar o código para produção</td><td>Configuração de implantação, <em>bootstrap</em> da base de dados e pastas de <em>uploads</em> configuráveis.</td></tr>
+      <tr><td>2</td><td>Tornar o arranque resiliente</td><td>Validação de variáveis, retentativas de ligação e <em>health check</em> sempre disponível.</td></tr>
+      <tr><td>3</td><td>Corrigir configuração da base de dados</td><td>Prioridade a <code>MYSQL_URL</code>, com alternativas para a palavra-passe.</td></tr>
+      <tr><td>4</td><td>Permitir explorar sem conta</td><td>Perfis de freelancers públicos e sessão que não é terminada sem <em>token</em>.</td></tr>
+      <tr><td>5</td><td>Automatizar o APK</td><td><em>Pipeline</em> de integração contínua que gera o artefacto Android.</td></tr>
+      <tr><td>6</td><td>Povoar a aplicação</td><td>Dados de demonstração idempotentes e melhoria do login em telemóvel.</td></tr>
+      <tr><td>7</td><td>Documentar o autor e o processo</td><td>Página “Sobre” integrada na aplicação.</td></tr>
+      <tr><td>8</td><td>Semear sem expor credenciais</td><td>Criação automática dos dados no arranque do servidor.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4.2 Decisões técnicas</h2>
+  <h3>Uma API para todos os clientes</h3>
+  <p>
+    Em vez de lógica duplicada, a aplicação Android, o site e os testes consomem os mesmos
+    <em>endpoints</em>. Isso reduz inconsistências e permite testar as regras de negócio
+    diretamente, sem interface.
+  </p>
+
+  <h3>Segredos apenas em variáveis de ambiente</h3>
+  <p>
+    Nenhuma credencial é escrita no código. Em desenvolvimento usa-se um ficheiro <code>.env</code>
+    local (ignorado pelo Git); em produção, as variáveis são definidas no painel do Railway. Os
+    erros de configuração listam apenas os <em>nomes</em> das variáveis em falta.
+  </p>
+
+  <h3>Operações idempotentes</h3>
+  <p>
+    Tanto a criação do esquema como o povoamento com dados de demonstração podem ser repetidos
+    sem duplicar registos. Isso torna a implantação segura e previsível.
+  </p>
+
+  <h2>4.3 Controlo de versões</h2>
+  <p>
+    O código está num repositório Git privado, com uma ramificação principal (<code>main</code>).
+    Cada alteração relevante foi registada num <em>commit</em> descritivo, o que permite
+    reconstruir a evolução do projeto e rever decisões.
+  </p>
+</section>
+
+<!-- ==================== 5. IMPLANTAÇÃO ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 5</p>
+  <h1 class="sec"><span class="n">5.</span> Implantação e publicação</h1>
+
+  <h2>5.1 Backend</h2>
+  <p>
+    O servidor está publicado no Railway. O serviço usa a pasta <code>backend</code> como raiz,
+    o construtor <strong>RAILPACK</strong> e o comando <code>npm start</code>. O
+    <em>health check</em> aponta para <code>/api/health</code>, com tolerância de 120 segundos, e
+    a política de reinício é “em falha”, com até 10 tentativas.
+  </p>
+
+  <div class="callout">
+    <span class="t">Endereço público</span>
+    <p class="small">
+      https://freelamz-production-7103b885.up.railway.app/api
+    </p>
+  </div>
+
+  <h2>5.2 Variáveis de ambiente</h2>
+  <table>
+    <caption>Tabela 5 — Variáveis principais</caption>
+    <thead>
+      <tr><th style="width:30%;">Variável</th><th style="width:16%;">Obrigatória</th><th>Função</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>MYSQL_URL</code></td><td>Sim</td><td>Ligação completa à base de dados (tem prioridade).</td></tr>
+      <tr><td><code>JWT_SECRET</code></td><td>Sim (produção)</td><td>Assinatura dos <em>tokens</em> de sessão.</td></tr>
+      <tr><td><code>NODE_ENV</code></td><td>Sim</td><td>Ambiente de execução (<code>production</code>).</td></tr>
+      <tr><td><code>CORS_ORIGINS</code></td><td>Recomendada</td><td>Origens autorizadas no navegador e na aplicação.</td></tr>
+      <tr><td><code>SEED_DEMO</code></td><td>Não</td><td>Cria dados de exemplo no arranque.</td></tr>
+      <tr><td><code>UPLOADS_DIR</code></td><td>Não</td><td>Pasta de imagens (volume persistente).</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5.3 Base de dados</h2>
+  <p>
+    A base de dados MySQL é gerida pelo Railway e reside no mesmo projeto, com ligação interna.
+    A inicialização aplica, por esta ordem: esquema, catálogo (categorias e competências),
+    migrações e criação do administrador. O povoamento com dados de demonstração é opcional e
+    idempotente.
+  </p>
+
+  <h2>5.4 Aplicação Android</h2>
+  <p>
+    O APK é produzido pelo GitHub Actions em quatro passos: compilação do <em>frontend</em> com a
+    URL da API, sincronização com o Capacitor, compilação com Gradle (Java 21) e publicação do
+    artefacto. O processo demora entre dois e quatro minutos e dispensa a instalação do Android
+    Studio.
+  </p>
+
+  <div class="callout ok">
+    <span class="t">Resultado</span>
+    <p>
+      Três versões do APK foram geradas com sucesso durante o desenvolvimento, incluindo a versão
+      final que integra a página “Sobre” e o login corrigido para telemóvel.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 6. RESULTADOS ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 6</p>
+  <h1 class="sec"><span class="n">6.</span> Resultados e testes</h1>
+
+  <h2>6.1 Estado atual</h2>
+  <p>
+    A aplicação está operacional. A Tabela 6 apresenta os valores observados na API pública no
+    momento da redação deste relatório.
+  </p>
+
+  <div class="stats">
+    <div class="stat"><div class="v">12</div><div class="l">categorias</div></div>
+    <div class="stat"><div class="v">8</div><div class="l">freelancers demo</div></div>
+    <div class="stat"><div class="v">2</div><div class="l">clientes demo</div></div>
+    <div class="stat"><div class="v">12</div><div class="l">serviços</div></div>
+  </div>
+
+  <table>
+    <caption>Tabela 6 — Verificações realizadas</caption>
+    <thead>
+      <tr><th style="width:44%;">Verificação</th><th>Resultado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Testes automáticos da API</td><td>130 de 130 aprovados</td></tr>
+      <tr><td>Compilação do <em>frontend</em></td><td>Concluída com sucesso (~1 minuto)</td></tr>
+      <tr><td>Estado da base de dados</td><td><code>db: "up"</code></td></tr>
+      <tr><td>Catálogo de categorias</td><td>12 registos</td></tr>
+      <tr><td>Serviços publicados</td><td>12 registos</td></tr>
+      <tr><td>Perfis de freelancers visíveis</td><td>9 registos</td></tr>
+      <tr><td>Autenticação de conta de demonstração</td><td>HTTP 200, perfil FREELANCER</td></tr>
+      <tr><td>Idempotência do povoamento</td><td>10 criadas → 0 criadas / 10 existentes</td></tr>
+      <tr><td>Geração do APK</td><td>Três execuções concluídas com sucesso</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 Testes funcionais</h2>
+  <p>
+    Para além dos testes automáticos, o fluxo foi exercitado manualmente: criação de conta,
+    autenticação, publicação de serviço, envio de proposta, aceitação, troca de mensagens,
+    entrega, aprovação e avaliação. Os testes no telemóvel incluíram ligação por dados móveis,
+    para validar o comportamento fora da rede local.
+  </p>
+
+  <h2>6.3 Dados de demonstração</h2>
+  <p>
+    O conjunto de demonstração inclui oito freelancers de áreas distintas (desenvolvimento,
+    design, fotografia, redação, contabilidade, marketing), dois clientes e doze serviços com
+    preço, prazo e descrição. As credenciais constam do Anexo A.
+  </p>
+</section>
+
+<!-- ==================== 7. DIFICULDADES ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 7</p>
+  <h1 class="sec"><span class="n">7.</span> Dificuldades encontradas e soluções</h1>
+
+  <p>
+    O desenvolvimento em ambiente real expôs problemas que não aparecem num servidor local. A
+    Tabela 7 documenta os principais, a causa identificada e a correção aplicada.
+  </p>
+
+  <table>
+    <caption>Tabela 7 — Problemas, causas e soluções</caption>
+    <thead>
+      <tr><th style="width:26%;">Sintoma</th><th style="width:28%;">Causa</th><th>Solução</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Deploy em ciclo de reinícios</td>
+        <td>Base de dados ainda a inicializar</td>
+        <td>Arranque resiliente, retentativas e <em>health check</em> sempre disponível.</td>
+      </tr>
+      <tr>
+        <td>Configuração da base de dados incompleta</td>
+        <td>Variáveis com nomes diferentes no fornecedor</td>
+        <td>Prioridade a <code>MYSQL_URL</code> e alternativas para a palavra-passe.</td>
+      </tr>
+      <tr>
+        <td>Aplicação vazia em produção</td>
+        <td>Apenas catálogo e administrador</td>
+        <td><em>Seed</em> de demonstração idempotente.</td>
+      </tr>
+      <tr>
+        <td>Dados não chegavam ao servidor</td>
+        <td>URL da base de dados vazia na máquina local</td>
+        <td>Criação automática no arranque, usando a ligação interna.</td>
+      </tr>
+      <tr>
+        <td>Login cortado no telemóvel</td>
+        <td>Altura fixa e falta de margens de segurança</td>
+        <td>CSS com centragem real, suporte a <em>notch</em> e campos de 16 px.</td>
+      </tr>
+      <tr>
+        <td>Página inicial exigia sessão</td>
+        <td>Endpoints privados e resposta 401 a encerrar sessão</td>
+        <td>Perfis públicos e encerramento apenas quando existe <em>token</em>.</td>
+      </tr>
+      <tr>
+        <td>Caracteres acentuados corrompidos</td>
+        <td>Codificação do terminal durante os testes</td>
+        <td>Testes passaram a usar <em>scripts</em> em Node.js com UTF-8.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <span class="t">Lição aprendida</span>
+    <p>
+      A maior parte dos incidentes não estava no código da aplicação, mas na configuração do
+      ambiente. Validar cedo as variáveis e expor diagnósticos claros (sem revelar segredos)
+      poupa horas de depuração.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 8. SEGURANÇA ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 8</p>
+  <h1 class="sec"><span class="n">8.</span> Segurança e privacidade</h1>
+
+  <h2>8.1 Autenticação e autorização</h2>
+  <p>
+    As palavras-passe são armazenadas com <em>hash</em> bcrypt, nunca em texto simples. Após o
+    login, o servidor emite um <em>token</em> JWT assinado, com prazo de validade. Cada pedido
+    protegido valida a assinatura e o tipo de utilizador, impedindo que um cliente execute ações
+    de administrador.
+  </p>
+
+  <h2>8.2 Exposição de dados</h2>
+  <p>
+    Os perfis de freelancers são públicos para permitir explorar a plataforma sem conta. No
+    entanto, as respostas públicas omitem o <strong>email</strong> e os
+    <strong>métodos de recebimento</strong>, que permanecem visíveis apenas para o próprio
+    utilizador e para o administrador.
+  </p>
+
+  <h2>8.3 Gestão de segredos</h2>
+  <ul>
+    <li>Credenciais apenas em variáveis de ambiente, nunca no repositório.</li>
+    <li>Ficheiro <code>.env</code> local excluído pelo Git.</li>
+    <li>Mensagens de erro mostram nomes de variáveis, não valores.</li>
+  </ul>
+
+  <h2>8.4 Comunicação e validação</h2>
+  <p>
+    Todo o tráfego em produção usa HTTPS. O CORS está limitado às origens da aplicação e do site.
+    Os <em>uploads</em> têm limite de tamanho e validação de tipo, e as consultas à base de dados
+    usam parâmetros, prevenindo injeção de SQL.
+  </p>
+</section>
+
+<!-- ==================== 9. LIMITAÇÕES ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 9</p>
+  <h1 class="sec"><span class="n">9.</span> Limitações e trabalho futuro</h1>
+
+  <h2>9.1 Limitações atuais</h2>
+  <ul>
+    <li><strong>Ficheiros efémeros:</strong> o disco da nuvem é reiniciado a cada implantação; sem volume persistente, as imagens perdem-se.</li>
+    <li><strong>APK de desenvolvimento:</strong> o pacote não está assinado para publicação na Play Store.</li>
+    <li><strong>Pagamentos simulados:</strong> o modo de teste não movimenta dinheiro real.</li>
+    <li><strong>Sem notificações <em>push</em>:</strong> os avisos existem apenas dentro da aplicação.</li>
+    <li><strong>Contas de demonstração com palavra-passe pública:</strong> adequadas a testes, não a produção.</li>
+  </ul>
+
+  <h2>9.2 Trabalho futuro</h2>
+  <ol>
+    <li>Configurar volume persistente ou serviço externo de imagens (por exemplo, Cloudinary).</li>
+    <li>Integrar pagamentos reais de M-Pesa e e-Mola em ambiente de testes.</li>
+    <li>Assinar o pacote Android (AAB) e publicar na Play Store.</li>
+    <li>Implementar notificações <em>push</em> com Firebase Cloud Messaging.</li>
+    <li>Alargar os testes end-to-end e automatizar a verificação da interface.</li>
+    <li>Adicionar painel de métricas para o administrador.</li>
+  </ol>
+</section>
+
+<!-- ==================== 10. CONCLUSÃO ==================== -->
+<section class="secao">
+  <p class="kicker">Capítulo 10</p>
+  <h1 class="sec"><span class="n">10.</span> Conclusão</h1>
+
+  <p>
+    O FreelaMZ partiu de um problema identificável — a ausência de um espaço organizado para
+    contratar freelancers em Moçambique — e chegou a uma aplicação publicada, com base de dados,
+    API e pacote Android. O percurso cumpriu os objetivos definidos: o fluxo de trabalho está
+    implementado de ponta a ponta, os perfis e serviços estão acessíveis, e a implantação é
+    reproduzível.
+  </p>
+  <p>
+    O trabalho confirmou que a complexidade de um projeto real não está apenas na escrita do
+    código, mas na configuração do ambiente, na validação contínua e na capacidade de diagnosticar
+    falhas com informação limitada. A existência de testes automáticos, de um
+    <em>health check</em> informativo e de operações idempotentes revelou-se decisiva.
+  </p>
+  <p>
+    Como trabalho futuro, a prioridade é consolidar a infraestrutura (armazenamento persistente e
+    pagamentos reais), assinar a aplicação e preparar o lançamento. O protótipo está pronto para
+    evoluir para um produto utilizado por clientes e freelancers reais.
+  </p>
+
+  <div class="signature">
+    Clávio Alfredo Chitsulete<br />
+    Maputo, novembro de 2026
+  </div>
+</section>
+
+<!-- ==================== REFERÊNCIAS ==================== -->
+<section class="secao">
+  <p class="kicker">Bibliografia</p>
+  <h1 class="sec">Referências</h1>
+
+  <div class="refs">
+    <p>CAPACITOR. <strong>Capacitor Documentation</strong>. Disponível em: https://capacitorjs.com/docs. Acesso em: nov. 2026.</p>
+    <p>EXPRESS. <strong>Express — Node.js web application framework</strong>. Disponível em: https://expressjs.com. Acesso em: nov. 2026.</p>
+    <p>FRAMEWORK7. <strong>Framework7 Documentation</strong>. Disponível em: https://framework7.io/docs. Acesso em: nov. 2026.</p>
+    <p>GITHUB. <strong>GitHub Actions Documentation</strong>. Disponível em: https://docs.github.com/actions. Acesso em: nov. 2026.</p>
+    <p>JONES, M.; BRADLEY, J.; SAKIMURA, N. <strong>JSON Web Token (JWT)</strong>. RFC 7519, IETF, 2015.</p>
+    <p>MYSQL. <strong>MySQL 8.0 Reference Manual</strong>. Oracle Corporation. Disponível em: https://dev.mysql.com/doc. Acesso em: nov. 2026.</p>
+    <p>OWASP FOUNDATION. <strong>OWASP Top 10 — Application Security Risks</strong>. Disponível em: https://owasp.org/www-project-top-ten. Acesso em: nov. 2026.</p>
+    <p>RAILWAY. <strong>Railway Documentation</strong>. Disponível em: https://docs.railway.app. Acesso em: nov. 2026.</p>
+    <p>REACT. <strong>React Documentation</strong>. Meta Open Source. Disponível em: https://react.dev. Acesso em: nov. 2026.</p>
+    <p>VITE. <strong>Vite Documentation</strong>. Disponível em: https://vitejs.dev. Acesso em: nov. 2026.</p>
+  </div>
+</section>
+
+<!-- ==================== ANEXO A ==================== -->
+<section class="secao">
+  <p class="kicker">Anexo A</p>
+  <h1 class="sec">Credenciais de teste</h1>
+
+  <p>
+    As contas abaixo existem apenas para demonstração e avaliação do projeto. A palavra-passe é
+    comum a todas as contas de demonstração.
+  </p>
+
+  <table>
+    <caption>Tabela A.1 — Contas de demonstração (produção)</caption>
+    <thead>
+      <tr><th style="width:26%;">Tipo</th><th style="width:44%;">Email</th><th>Palavra-passe</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Freelancer</td><td>isabel@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>carlos@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>beatriz@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>helder@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>rosa@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>amos@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>luis@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Freelancer</td><td>marta@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Cliente</td><td>cliente@demo.freelamz.mz</td><td>Demo1234</td></tr>
+      <tr><td>Cliente</td><td>empresa@demo.freelamz.mz</td><td>Demo1234</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Contas locais (desenvolvimento)</h2>
+  <table>
+    <caption>Tabela A.2 — Contas criadas pelo <em>seed</em> de desenvolvimento</caption>
+    <thead>
+      <tr><th style="width:26%;">Tipo</th><th style="width:44%;">Email</th><th>Palavra-passe</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Administrador</td><td>admin@freelamz.com</td><td>Admin@12345</td></tr>
+      <tr><td>Cliente</td><td>cliente@freelamz.com</td><td>Cliente@123</td></tr>
+      <tr><td>Freelancer</td><td>freela@freelamz.com</td><td>Freela@123</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <span class="t">Nota de segurança</span>
+    <p>
+      A conta de administrador de produção utiliza uma palavra-passe privada, definida pelo autor
+      e não incluída neste documento. As contas de demonstração devem ser removidas ou ter a
+      palavra-passe alterada antes de qualquer utilização pública.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== ANEXO B ==================== -->
+<section class="secao">
+  <p class="kicker">Anexo B</p>
+  <h1 class="sec">Comandos e estrutura do projeto</h1>
+
+  <h2>B.1 Estrutura resumida</h2>
+  <table>
+    <caption>Tabela B.1 — Organização das pastas</caption>
+    <thead>
+      <tr><th style="width:34%;">Pasta</th><th>Conteúdo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>backend/src/</code></td><td>Servidor, rotas, controladores, modelos e serviços.</td></tr>
+      <tr><td><code>backend/scripts/</code></td><td>Inicialização da base de dados e dados de demonstração.</td></tr>
+      <tr><td><code>backend/database/</code></td><td>Esquema e catálogo inicial (categorias e competências).</td></tr>
+      <tr><td><code>frontend/src/</code></td><td>Páginas, componentes, estilos e cliente da API.</td></tr>
+      <tr><td><code>frontend/android/</code></td><td>Projeto Android gerado pelo Capacitor.</td></tr>
+      <tr><td><code>.github/workflows/</code></td><td><em>Pipeline</em> de compilação do APK.</td></tr>
+      <tr><td><code>docs/</code></td><td>Relatórios e apresentação.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>B.2 Comandos principais</h2>
+  <table>
+    <caption>Tabela B.2 — Comandos de desenvolvimento</caption>
+    <thead>
+      <tr><th style="width:44%;">Comando</th><th>Função</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>npm run dev</code></td><td>Inicia o servidor ou o <em>frontend</em> em modo de desenvolvimento.</td></tr>
+      <tr><td><code>npm run build</code></td><td>Compila o <em>frontend</em> para produção.</td></tr>
+      <tr><td><code>npm run db:init</code></td><td>Aplica esquema, catálogo, migrações e cria o administrador.</td></tr>
+      <tr><td><code>npm run db:demo</code></td><td>Cria freelancers, clientes e serviços de demonstração.</td></tr>
+      <tr><td><code>npm run db:demo:limpar</code></td><td>Remove apenas as contas de demonstração.</td></tr>
+      <tr><td><code>npm run smoke</code></td><td>Executa as verificações automáticas da API.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>B.3 Reprodução do ambiente</h2>
+  <ol>
+    <li>Instalar Node.js 20 ou superior e MySQL 8.</li>
+    <li>Clonar o repositório e instalar dependências em <code>backend</code> e <code>frontend</code>.</li>
+    <li>Configurar o ficheiro <code>backend/.env</code> com as variáveis da base de dados.</li>
+    <li>Executar <code>npm run db:init</code> e, opcionalmente, <code>npm run db:demo</code>.</li>
+    <li>Iniciar a API e o <em>frontend</em> e abrir a aplicação no navegador.</li>
+    <li>Para o APK, configurar a variável <code>VITE_API_URL</code> no GitHub e executar o fluxo “Build APK”.</li>
+  </ol>
+</section>
+
+</body>
+</html>
